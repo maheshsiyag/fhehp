@@ -1,7 +1,4 @@
 concrete-ml==1.0.0
-gradio==3.10.0
-pandas==1.4.3
-uvicorn==0.18.2
-transformers==4.20.1
-fastapi==0.79.0
-jupyter==1.0.0
+gradio==3.11.0
+uvicorn==0.20.0
+fastapi==0.87.0
