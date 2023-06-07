@@ -307,7 +307,7 @@ if __name__ == "__main__":
         )
         # Load the model
         concrete_classifier = load(
-            open("ConcreteRandomForestClassifier.pkl", "r", encoding="utf-8")
+            open("ConcreteXGBoostClassifier.pkl", "r", encoding="utf-8")
         )
 
         gr.Markdown("# Step 2: Generate the keys")
