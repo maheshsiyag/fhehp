@@ -165,7 +165,7 @@ def get_user_symptoms_from_default_disease(disease):
     return pretty_print(columns_with_1)
 
 
-def get_user_symptoms_vector(selected_default_disease, *selected_symptoms):
+def get_user_symptoms_vector_btn(selected_default_disease, *selected_symptoms):
 
     if any(lst for lst in selected_symptoms if lst) and (
         selected_default_disease is not None and len(selected_default_disease) > 0
@@ -211,7 +211,7 @@ def get_user_symptoms_vector(selected_default_disease, *selected_symptoms):
         }
 
 
-def clear_all_buttons():
+def clear_all_btn():
     return {
         user_id_textbox: None,
         eval_key_textbox: None,
@@ -229,6 +229,10 @@ if __name__ == "__main__":
     (df_train, X_train, X_test), (df_test, y_train, y_test) = load_data()
 
     valid_columns = X_train.columns.to_list()
+
+    # Load the model
+    with open("ConcreteXGBoostClassifier.pkl", "r", encoding="utf-8") as file:
+        concrete_classifier = load(file)
 
     with gr.Blocks() as demo:
 
@@ -301,13 +305,9 @@ if __name__ == "__main__":
         # Click submit botton
 
         submit_button.click(
-            fn=get_user_symptoms_vector,
+            fn=get_user_symptoms_vector_btn,
             inputs=[box_default, *check_boxes],
             outputs=[user_vector_textbox, error_box, *check_boxes],
-        )
-        # Load the model
-        concrete_classifier = load(
-            open("ConcreteXGBoostClassifier.pkl", "r", encoding="utf-8")
         )
 
         gr.Markdown("# Step 2: Generate the keys")
@@ -341,7 +341,7 @@ if __name__ == "__main__":
         gen_key.click(key_gen, outputs=[eval_key_textbox, user_id_textbox, eval_key_len_textbox])
 
         clear_button.click(
-            clear_all_buttons,
+            clear_all_btn,
             outputs=[
                 user_id_textbox,
                 user_vector_textbox,
