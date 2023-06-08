@@ -1,13 +1,14 @@
 import os
 import shutil
 import subprocess
+import time
 from pathlib import Path
-from time import time
 from typing import List, Tuple, Union
 
 import gradio as gr
 import numpy as np
 import pandas as pd
+import requests
 from preprocessing import pretty_print
 from symptoms_categories import SYMPTOMS_LIST
 
@@ -16,16 +17,21 @@ from concrete.ml.deployment import FHEModelClient, FHEModelDev, FHEModelServer
 from concrete.ml.sklearn import XGBClassifier as ConcreteXGBoostClassifier
 
 INPUT_BROWSER_LIMIT = 635
-
+SERVER_URL = "http://localhost:8000/"
 # This repository's main necessary folders
 REPO_DIR = Path(__file__).parent
 MODEL_PATH = REPO_DIR / "client_folder"
 KEYS_PATH = REPO_DIR / ".fhe_keys"
-CLIENT_PATH = MODEL_PATH / "client.zip"
-SERVER_PATH = MODEL_PATH / "server.zip"
+CLIENT_TMP_PATH = REPO_DIR / "client_tmp"
+SERVER_TMP_PATH = REPO_DIR / "server_tmp"
 
-# subprocess.Popen(["uvicorn", "server:app"], cwd=REPO_DIR)
-# time.sleep(3)
+# Create the necessary folders
+KEYS_PATH.mkdir(exist_ok=True)
+CLIENT_TMP_PATH.mkdir(exist_ok=True)
+SERVER_TMP_PATH.mkdir(exist_ok=True)
+
+subprocess.Popen(["uvicorn", "server:app"], cwd=REPO_DIR)
+time.sleep(3)
 
 
 def clean_directory():
@@ -169,8 +175,8 @@ def key_gen_fn(user_symptoms):
 
     # np.save(f".fhe_keys/{user_id}/eval_key.npy", serialized_evaluation_keys)
     evaluation_key_path = KEYS_PATH / f"{user_id}/evaluation_key"
-    with evaluation_key_path.open("wb") as evaluation_key_file:
-        evaluation_key_file.write(serialized_evaluation_keys)
+    with evaluation_key_path.open("wb") as f:
+        f.write(serialized_evaluation_keys)
 
     serialized_evaluation_keys_shorten_hex = serialized_evaluation_keys.hex()[:INPUT_BROWSER_LIMIT]
 
@@ -200,7 +206,7 @@ def encrypt_fn(user_symptoms, user_id):
 
     quant_user_symptoms = client.model.quantize_input(user_symptoms)
     encrypted_quantized_user_symptoms = client.quantize_encrypt_serialize(user_symptoms)
-
+    assert isinstance(encrypted_quantized_user_symptoms, bytes)
     encrypted_input_path = KEYS_PATH / f"{user_id}/encrypted_symptoms"
 
     with encrypted_input_path.open("wb") as f:
@@ -227,46 +233,69 @@ def encrypt_fn(user_symptoms, user_id):
     }
 
 
-# def send_input(user_id, user_symptoms):
-#     """Send the encrypted input image as well as the evaluation key to the server.
-
-#     Args:
-#         user_id (int): The current user's ID.
-#         filter_name (str): The current filter to consider.
-#     """
-#     # Get the evaluation key path
+def is_nan(input):
+    return input is None or (input is not None and len(input) < 1)
 
 
-#     evaluation_key_path = get_client_file_path("evaluation_key", user_id, filter_name)
+def send_input_fn(user_id, user_symptoms):
+    """Send the encrypted input image as well as the evaluation key to the server.
 
-#     if user_id == "" or not evaluation_key_path.is_file():
-#         raise gr.Error("Please generate the private key first.")
+    Args:
+        user_id (int): The current user's ID.
+        filter_name (str): The current filter to consider.
+    """
+    # Get the evaluation key path
 
-#     encrypted_input_path = get_client_file_path("encrypted_image", user_id, filter_name)
-#     encrypted_symptoms_path = KEYS_PATH / f"{user_id}" / "encrypted_symtoms"
+    if is_nan(user_id) or is_nan(user_symptoms):
+        return {
+            error_box_4: gr.update(
+                visible=True,
+                value="Please ensure that the evaluation key has been generated "
+                "and the symptoms have been submitted before sending the data to the server",
+            )
+        }
 
-#     if not encrypted_input_path.is_file():
-#         raise gr.Error("Please generate the private key and then encrypt an image first.")
+    evaluation_key_path = KEYS_PATH / f"{user_id}/evaluation_key"
+    encrypted_input_path = KEYS_PATH / f"{user_id}/encrypted_symptoms"
 
-#     # Define the data and files to post
-#     data = {
-#         "user_id": user_id,
-#         "filter": filter_name,
-#     }
+    if not evaluation_key_path.is_file():
+        print(f"Please generate the private key, first.{evaluation_key_path.is_file()=}")
 
-#     files = [
-#         ("files", open(encrypted_input_path, "rb")),
-#         ("files", open(evaluation_key_path, "rb")),
-#     ]
+        return {
+            error_box_4: gr.update(visible=True, value="Please generate the private key first.")
+        }
 
-#     # Send the encrypted input image and evaluation key to the server
-#     url = SERVER_URL + "send_input"
-#     with requests.post(
-#         url=url,
-#         data=data,
-#         files=files,
-#     ) as response:
-#         return response.ok
+    if not encrypted_input_path.is_file():
+        print(f"Please submit your symptoms, first.{encrypted_input_path.is_file()=}")
+
+        return {
+            error_box_4: gr.update(
+                visible=True,
+                value="Please generate the private key and then encrypt an image first.",
+            )
+        }
+
+    # Define the data and files to post
+    data = {
+        "user_id": user_id,
+        "filter": user_symptoms,
+    }
+
+    files = [
+        ("files", open(encrypted_input_path, "rb")),
+        ("files", open(evaluation_key_path, "rb")),
+    ]
+
+    # Send the encrypted input image and evaluation key to the server
+    url = SERVER_URL + "send_input"
+    with requests.post(
+        url=url,
+        data=data,
+        files=files,
+    ) as response:
+        print(f"response.ok: {response.ok}")
+
+    return {error_box_4: gr.update(visible=False), server_response_box: gr.update(visible=True)}
 
 
 # def decrypt_prediction(encrypted_quantized_vect, user_id):
@@ -277,11 +306,13 @@ def encrypt_fn(user_symptoms, user_id):
 #     return predictions
 
 
-
-
 def clear_all_btn():
+
+    clean_directory()
+
     return {
         box_default: None,
+        vect_textbox: None,
         user_id_textbox: None,
         eval_key_textbox: None,
         quant_vect_textbox: None,
@@ -291,13 +322,14 @@ def clear_all_btn():
         error_box_1: gr.update(visible=False),
         error_box_2: gr.update(visible=False),
         error_box_3: gr.update(visible=False),
+        error_box_4: gr.update(visible=False),
+        server_response_box: gr.update(visible=False),
         **{box: None for box in check_boxes},
     }
 
 
 if __name__ == "__main__":
     print("Starting demo ...")
-    
 
     (df_train, X_train, X_test), (df_test, y_train, y_test) = load_data()
 
@@ -423,7 +455,7 @@ if __name__ == "__main__":
         gr.Markdown("# Step 3: Encode the message with the private key")
         gr.Markdown("Client side")
 
-        encrypt_btn = gr.Button("Encode the message with the private key and send it to the server")
+        encrypt_btn = gr.Button("Encode the message with the private key")
 
         error_box_3 = gr.Textbox(label="Error", visible=False)
 
@@ -452,12 +484,25 @@ if __name__ == "__main__":
             outputs=[vect_textbox, quant_vect_textbox, encrypted_vect_textbox, error_box_3],
         )
 
-        gr.Markdown("# Step 4: Run the FHE evaluation")
+        gr.Markdown("# Step 4: Send the encrypted data to the server.")
+        gr.Markdown("Client side")
+
+        send_input_btn = gr.Button("Send the encrypted data to the server..")
+        error_box_4 = gr.Textbox(label="Error", visible=False)
+        server_response_box = gr.Textbox(value="Data sent", visible=False, show_label=False)
+
+        send_input_btn.click(
+            send_input_fn,
+            inputs=[user_id_textbox, user_vector_textbox],
+            outputs=[error_box_4, server_response_box],
+        )
+
+        gr.Markdown("# Step 5: Run the FHE evaluation")
         gr.Markdown("Server side")
 
         run_fhe = gr.Button("Run the FHE evaluation")
 
-        gr.Markdown("# Step 5: Decrypt the sentiment")
+        gr.Markdown("# Step 6: Decrypt the sentiment")
         gr.Markdown("Server side")
 
         decrypt_target_botton = gr.Button("Decrypt the sentiment")
@@ -478,10 +523,13 @@ if __name__ == "__main__":
                 error_box_1,
                 error_box_2,
                 error_box_3,
+                error_box_4,
+                vect_textbox,
                 user_id_textbox,
                 eval_key_textbox,
                 quant_vect_textbox,
                 user_vector_textbox,
+                server_response_box,
                 eval_key_len_textbox,
                 encrypted_vect_textbox,
                 *check_boxes,
