@@ -7,12 +7,8 @@ Each variable contains a list of symptoms sthat can be pecific to a part of the 
 of similar symptoms.
 """
 
-import itertools
-
-import pandas as pd
-
 DIGESTIVE_SYSTEM_SYPTOMS = {
-    "Digestive system syptoms": [
+    "Digestive_system_symptoms": [
         "stomach_pain",
         "acidity",
         "vomiting",
@@ -38,7 +34,7 @@ DIGESTIVE_SYSTEM_SYPTOMS = {
 }
 
 SKIN_SYPTOMS = {
-    "Skin related symptoms": [
+    "Skin_related_symptoms": [
         "itching",
         "skin_rash",
         "pus_filled_pimples",
@@ -57,8 +53,8 @@ SKIN_SYPTOMS = {
     ]
 }
 
-ORL_SYPTOMS = {
-    "ORL_SYPTOMS": [
+ORL_SYMPTOMS = {
+    "ORL_SYMPTOMS": [
         "loss_of_smell",
         "continuous_sneezing",
         "runny_nose",
@@ -148,7 +144,7 @@ MUSCULOSKELETAL_SYMPTOMS = {
 }
 
 FEELING_SYMPTOMS = {
-    "FEELING_SYPTOMS": [
+    "FEELING_SYMPTOMS": [
         "anxiety",
         "restlessness",
         "lethargy",
@@ -167,8 +163,8 @@ FEELING_SYMPTOMS = {
     ]
 }
 
-OTHER_SYPTOMS = {
-    "OTHER_SYPTOMS": [
+OTHER_SYMPTOMS = {
+    "OTHER_SYMPTOMS": [
         "ulcers_on_tongue",
         "shivering",
         "chills",
@@ -201,7 +197,7 @@ PATIENT_HISTORY = {
 SYMPTOMS_LIST = [
     SKIN_SYPTOMS,
     EYES_SYMPTOMS,
-    ORL_SYPTOMS,
+    ORL_SYMPTOMS,
     THORAX_SYMPTOMS,
     DIGESTIVE_SYSTEM_SYPTOMS,
     UROLOGICAL_SYMPTOMS,
@@ -209,18 +205,5 @@ SYMPTOMS_LIST = [
     MUSCULOSKELETAL_SYMPTOMS,
     FEELING_SYMPTOMS,
     PATIENT_HISTORY,
-    OTHER_SYPTOMS,
+    OTHER_SYMPTOMS,
 ]
-
-
-def test(file_path="./Training.csv"):
-    df = pd.read_csv(file_path, index_col=0)
-    valid_column = df.columns
-    all_symptoms = [category.values() for category in SYMPTOMS_LIST]
-    all_symptoms = list(itertools.chain.from_iterable(all_symptoms))
-    all_symptoms = list(itertools.chain.from_iterable(all_symptoms))
-    set(valid_column) - set(all_symptoms), set(all_symptoms) - set(valid_column)
-
-
-if __name__ == "__main__":
-    test()

@@ -1,44 +1,40 @@
 """Server that will listen for GET and POST requests from the client."""
 
 import time
-from pathlib import Path
 from typing import List
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import JSONResponse, Response
+from utils import DEPLOYMENT_DIR, SERVER_DIR # pylint: disable=no-name-in-module)
 
 from concrete.ml.deployment import FHEModelServer
 
-REPO_DIR = Path(__file__).parent
-KEYS_PATH = REPO_DIR / ".fhe_keys"
-MODEL_PATH = REPO_DIR / "client_folder"
-
-SERVER_TMP_PATH = REPO_DIR / "server_tmp"
 # Initialize an instance of FastAPI
 app = FastAPI()
-
-current_dir = Path(__file__).parent
-
-# Load the model
-fhe_model = FHEModelServer(Path.joinpath(current_dir, "./client_folder"))
 
 # Define the default route
 @app.get("/")
 def root():
-    return {"message": "Welcome to Your disease prediction with fhe !"}
+    """
+    Root endpoint of the health prediction API.
+
+    Returns:
+        dict: The welcome message.
+    """
+    return {"message": "Welcome to your disease prediction with FHE!"}
 
 
 @app.post("/send_input")
 def send_input(
     user_id: str = Form(),
-    filter: str = Form(),
     files: List[UploadFile] = File(),
 ):
-
     """Send the inputs to the server."""
-    # Retrieve the encrypted input image and the evaluation key paths
-    evaluation_key_path = SERVER_TMP_PATH / f"{user_id}_valuation_key"
-    encrypted_input_path = SERVER_TMP_PATH / f"{user_id}_encrypted_symptoms"
+
+    print("\nSend the data to the server ............\n")
+    # Retrieve the encrypted input and the evaluation key paths
+    evaluation_key_path = SERVER_DIR / f"{user_id}_valuation_key"
+    encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_symptoms"
 
     # # Write the files using the above paths
     with encrypted_input_path.open("wb") as encrypted_input, evaluation_key_path.open(
@@ -48,51 +44,54 @@ def send_input(
         evaluation_key.write(files[1].file.read())
 
 
+@app.post("/run_fhe")
+def run_fhe(
+    user_id: str = Form(),
+):
+    """Inference in FHE."""
 
-# @app.post("/run_fhe")
-# def run_fhe(
-#     user_id: str = Form(),
-#     filter: str = Form(),
-# ):
-#     """Execute the filter on the encrypted input image using FHE."""
-#     Retrieve the encrypted input image and the evaluation key paths
-#     encrypted_image_path = get_server_file_path("encrypted_image", user_id, filter)
-#     evaluation_key_path = get_server_file_path("evaluation_key", user_id, filter)
+    print("\nRun in FHE in the server ............\n")
+    evaluation_key_path = SERVER_DIR / f"{user_id}_valuation_key"
+    encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_symptoms"
 
-#     Read the files using the above paths
-#     with encrypted_image_path.open("rb") as encrypted_image_file, evaluation_key_path.open(
-#         "rb"
-#     ) as evaluation_key_file:
-#         encrypted_image = encrypted_image_file.read()
-#         evaluation_key = evaluation_key_file.read()
+    # Read the files using the above paths
+    with encrypted_input_path.open("rb") as encrypted_output_file, evaluation_key_path.open(
+        "rb"
+    ) as evaluation_key_file:
+        encrypted_output = encrypted_output_file.read()
+        evaluation_key = evaluation_key_file.read()
 
-#     Load the FHE server
-#     fhe_server = FHEServer(FILTERS_PATH / f"{filter}/deployment")
+    # Load the FHE server and the model
+    fhe_server = FHEModelServer(DEPLOYMENT_DIR)
 
-#     Run the FHE execution
-#     start = time.time()
-#     encrypted_output_image = fhe_server.run(encrypted_image, evaluation_key)
-#     fhe_execution_time = round(time.time() - start, 2)
+    # Run the FHE execution
+    start = time.time()
+    encrypted_output = fhe_server.run(encrypted_output, evaluation_key)
+    assert isinstance(encrypted_output, bytes)
+    fhe_execution_time = round(time.time() - start, 2)
 
-#     Retrieve the encrypted output image path
-#     encrypted_output_path = get_server_file_path("encrypted_output", user_id, filter)
+    # Retrieve the encrypted output path
+    encrypted_output_path = SERVER_DIR / f"{user_id}_encrypted_output"
 
-#     Write the file using the above path
-#     with encrypted_output_path.open("wb") as encrypted_output:
-#         encrypted_output.write(encrypted_output_image)
+    # Write the file using the above path
+    with encrypted_output_path.open("wb") as f:
+        f.write(encrypted_output)
 
-#     return JSONResponse(content=fhe_execution_time)
+    return JSONResponse(content=fhe_execution_time)
 
 
-# @app.post("/get_output")
-# def get_output(
-#     user_id: str = Form(),
-#     filter: str = Form(),
-# ):
-#     """Retrieve the encrypted output image."""
-#     Retrieve the encrypted output image path
-#     encrypted_output_path = get_server_file_path("encrypted_output", user_id, filter)
+@app.post("/get_output")
+def get_output(user_id: str = Form()):
+    """Retrieve the encrypted output."""
 
-#     Read the file using the above path
-#     with encrypted_output_path.open("rb") as encrypted_output_file:
-#         encrypted_output = encrypted_output_file.read()
+    print("\nGet the output from the server ............\n")
+    # Retrieve the encrypted output path
+    encrypted_output_path = SERVER_DIR / f"{user_id}_encrypted_output"
+
+    # Read the file using the above path
+    with encrypted_output_path.open("rb") as f:
+        encrypted_output = f.read()
+
+    time.sleep(1)
+
+    return Response(encrypted_output)
