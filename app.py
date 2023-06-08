@@ -487,7 +487,7 @@ if __name__ == "__main__":
         gr.Markdown("# Step 4: Send the encrypted data to the server.")
         gr.Markdown("Client side")
 
-        send_input_btn = gr.Button("Send the encrypted data to the server..")
+        send_input_btn = gr.Button("Send the encrypted data to the server.")
         error_box_4 = gr.Textbox(label="Error", visible=False)
         server_response_box = gr.Textbox(value="Data sent", visible=False, show_label=False)
 
