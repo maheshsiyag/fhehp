@@ -69,7 +69,7 @@ def clean_directory() -> None:
     for target_dir in ALL_DIRS:
         if os.path.exists(target_dir) and os.path.isdir(target_dir):
             shutil.rmtree(target_dir)
-        target_dir.mkdir(exist_ok=True)
+        target_dir.mkdir(exist_ok=True, parents=True)
 
 
 def get_disease_name(encoded_prediction: int, file_name: str = TRAINING_FILENAME) -> str:
