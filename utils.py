@@ -113,7 +113,7 @@ def load_data() -> Tuple[pandas.DataFrame, pandas.DataFrame, numpy.ndarray]:
     y_test = df_test[TARGET_COLUMNS[0]]
     X_test = df_test.drop(columns=TARGET_COLUMNS, axis=1, errors="ignore")
 
-    return (df_train, X_train, X_test), (df_test, y_train, y_test)
+    return (X_train, X_test), (y_train, y_test)
 
 
 def load_model(X_train: pandas.DataFrame, y_train: numpy.ndarray):

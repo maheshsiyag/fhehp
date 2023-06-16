@@ -1,7 +1,6 @@
 import subprocess
 import time
-from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple
 
 import gradio as gr
 import numpy as np
@@ -28,15 +27,59 @@ from concrete.ml.deployment import FHEModelClient
 subprocess.Popen(["uvicorn", "server:app"], cwd=CURRENT_DIR)
 time.sleep(3)
 
-# pylint: disable=c-extension-no-member
-def is_nan(inputs):
+# pylint: disable=c-extension-no-member,invalid-name
+
+
+def is_nan(inputs) -> bool:
+    """
+    Check if the input is NaN.
+
+    Args:
+        inputs (any): The input to be checked.
+
+    Returns:
+        bool: True if the input is NaN or empty, False otherwise.
+    """
     return inputs is None or (inputs is not None and len(inputs) < 1)
 
 
-def get_user_symptoms_from_checkboxgroup(checkbox_symptoms) -> np.array:
+# def fill_in_fn(default_disease: str, *checkbox_symptoms: Tuple[str]) -> Dict:
+#     """
+#     Fill in the gr.CheckBoxGroup list with the predefined symptoms of a selected default disease.
 
+#     Args:
+#         default_disease (str): The default disease
+#         *checkbox_symptoms (Tuple[str]): Tuple of selected symptoms
+
+#     Returns:
+#         dict: The updated gr.CheckBoxesGroup.
+#     """
+#     df = pd.read_csv(TRAINING_FILENAME)
+#     df_filtred = df[df[TARGET_COLUMNS[1]] == default_disease]
+#     symptoms = pretty_print(df_filtred.columns[df_filtred.eq(1).any()].to_list())
+
+#     if any(lst for lst in checkbox_symptoms if lst):
+#         for sublist in checkbox_symptoms:
+#             symptoms.extend(sublist)
+
+#     return {box: symptoms for box in check_boxes}
+
+
+def get_user_symptoms_from_checkboxgroup(checkbox_symptoms: List) -> np.array:
+    """
+    Convert the user symptoms into a binary vector representation.
+
+    Args:
+        checkbox_symptoms (list): A list of user symptoms.
+
+    Returns:
+        np.array: A binary vector representing the user's symptoms.
+
+    Raises:
+        KeyError: If a provided symptom is not recognized as a valid symptom.
+
+    """
     symptoms_vector = {key: 0 for key in valid_columns}
-
     for pretty_symptom in checkbox_symptoms:
         original_symptom = "_".join((pretty_symptom.lower().split(" ")))
         if original_symptom not in symptoms_vector.keys():
@@ -53,20 +96,16 @@ def get_user_symptoms_from_checkboxgroup(checkbox_symptoms) -> np.array:
     return user_symptoms_vect
 
 
-def fill_in_fn(default_disease, *checkbox_symptoms):
+def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
+    """
+    Get vector features based on the selected symptoms.
 
-    df = pd.read_csv(TRAINING_FILENAME)
-    df_filtred = df[df[TARGET_COLUMNS[1]] == default_disease]
-    symptoms = pretty_print(df_filtred.columns[df_filtred.eq(1).any()].to_list())
+    Args:
+        checked_symptoms (Tuple[str]): User symptoms
 
-    if any(lst for lst in checkbox_symptoms if lst):
-        for sublist in checkbox_symptoms:
-            symptoms.extend(sublist)
-
-    return {box: symptoms for box in check_boxes}
-
-
-def get_features(*checked_symptoms):
+    Returns:
+        Dict: The encoded user vector symptoms.
+    """
     if not any(lst for lst in checked_symptoms if lst):
         return {
             error_box1: gr.update(
@@ -118,7 +157,7 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
     with evaluation_key_path.open("wb") as f:
         f.write(serialized_evaluation_keys)
 
-    serialized_evaluation_keys_shorten_hex = serialized_evaluation_keys.hex()[:INPUT_BROWSER_LIMIT]
+    serialized_evaluation_keys_shorten_hex = serialized_evaluation_keys.hex()[:INPUT_BROWSER_LIMIT]   
 
     return {
         error_box2: gr.update(visible=False),
@@ -128,7 +167,14 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
     }
 
 
-def encrypt_fn(user_symptoms, user_id):
+def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
+    """
+    Encrypt the user symptoms vector in the `Client Side`.
+
+    Args:
+        user_symptoms (List[str]): The vector symptoms provided by the user
+        user_id (user): The current user's ID
+    """
 
     if is_nan(user_id) or is_nan(user_symptoms):
         print("Error in encryption step: Provide your symptoms and generate the evaluation keys.")
@@ -164,7 +210,7 @@ def encrypt_fn(user_symptoms, user_id):
     }
 
 
-def send_input_fn(user_id, user_symptoms):
+def send_input_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     """Send the encrypted data and the evaluation key to the server.
 
     Args:
@@ -215,7 +261,7 @@ def send_input_fn(user_id, user_symptoms):
         ("files", open(evaluation_key_path, "rb")),
     ]
 
-    # Send the encrypted input image and evaluation key to the server
+    # Send the encrypted input and evaluation key to the server
     url = SERVER_URL + "send_input"
     with requests.post(
         url=url,
@@ -226,12 +272,11 @@ def send_input_fn(user_id, user_symptoms):
     return {error_box4: gr.update(visible=False), srv_resp_send_data_box: "Data sent"}
 
 
-def run_fhe_fn(user_id):
-    """Send the encrypted input image as well as the evaluation key to the server.
+def run_fhe_fn(user_id: str) -> Dict:
+    """Send the encrypted input as well as the evaluation key to the server.
 
     Args:
         user_id (int): The current user's ID.
-        filter_name (str): The current filter to consider.
     """
     if is_nan(user_id):  # or is_nan(user_symptoms):
         return {
@@ -246,7 +291,7 @@ def run_fhe_fn(user_id):
         "user_id": user_id,
     }
 
-    # Trigger the FHE execution on the encrypted image previously sent
+    # Trigger the FHE execution on the encrypted previously sent
 
     url = SERVER_URL + "run_fhe"
 
@@ -268,7 +313,14 @@ def run_fhe_fn(user_id):
     }
 
 
-def get_output_fn(user_id, user_symptoms):
+def get_output_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
+    """Retreive the encrypted data from the server.
+
+    Args:
+        user_id (int): The current user's ID
+        user_symptoms (numpy.ndarray): The user symptoms
+    """
+
     if is_nan(user_id) or is_nan(user_symptoms):
         return {
             error_box6: gr.update(
@@ -278,11 +330,13 @@ def get_output_fn(user_id, user_symptoms):
             )
         }
 
+
+
     data = {
         "user_id": user_id,
     }
 
-    # Retrieve the encrypted output image
+    # Retrieve the encrypted output
     url = SERVER_URL + "get_output"
     with requests.post(
         url=url,
@@ -302,7 +356,17 @@ def get_output_fn(user_id, user_symptoms):
     return {error_box6: gr.update(visible=False), srv_resp_retrieve_data_box: "Data received"}
 
 
-def decrypt_fn(user_id, user_symptoms):
+def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
+    """Dencrypt the data on the `Client Side`.
+
+    Args:
+        user_id (int): The current user's ID
+        user_symptoms (numpy.ndarray): The user symptoms
+        
+    Returns:
+        Decrypted output
+    """
+
     if is_nan(user_id) or is_nan(user_symptoms):
         return {
             error_box7: gr.update(
@@ -343,13 +407,14 @@ def decrypt_fn(user_id, user_symptoms):
     }
 
 
+
 def clear_all_btn():
     """Clear all the box outputs."""
 
     clean_directory()
 
     return {
-        disease_box: None,
+        # disease_box: None,
         user_id_box: None,
         user_vect_box1: None,
         user_vect_box2: None,
@@ -382,10 +447,12 @@ CSS = """
 """
 
 if __name__ == "__main__":
+
     print("Starting demo ...")
+    
     clean_directory()
 
-    (_, X_train, X_test), (df_test, y_train, y_test) = load_data()
+    (X_train, X_test), (y_train, y_test) = load_data()
 
     valid_columns = X_train.columns.to_list()
 
@@ -411,7 +478,7 @@ if __name__ == "__main__":
             </p>
 
             <p align="center">
-            <img width="100%" height="30%" src="https://raw.githubusercontent.com/kcelia/Img/main/HEALTHCARE PREDICTION USING MACHINE LEARNING WITH FULLY HOMOMORPHIC ENCRYPTION.png">
+            <img width="100%" height="30%" src="https://raw.githubusercontent.com/kcelia/Img/main/health_prediction_img.png">
             </p>
             """
         )
@@ -430,8 +497,8 @@ if __name__ == "__main__":
                 check_boxes = []
                 for i, category in enumerate(SYMPTOMS_LIST):
                     with gr.Accordion(
-                        pretty_print(category.keys()), open=True, elem_classes="feedback"
-                    ):
+                        pretty_print(category.keys()), open=False, elem_classes="feedback"
+                    ) as accordion:
                         check_box = gr.CheckboxGroup(
                             pretty_print(category.values()),
                             label=pretty_print(category.keys()),
@@ -442,31 +509,30 @@ if __name__ == "__main__":
                 error_box1 = gr.Textbox(label="Error", visible=False)
 
                 # Default disease, picked from the dataframe
-                disease_box = gr.Dropdown(list(sorted(set(df_test["prognosis"]))), label="Disease:")
-
-                disease_box.change(
-                    fn=fill_in_fn,
-                    inputs=[disease_box, *check_boxes],
-                    outputs=[*check_boxes],
-                )
+                # disease_box = gr.Dropdown(list(sorted(set(df_test["prognosis"]))), 
+                # label="Disease:")
+                # disease_box.change(
+                #     fn=fill_in_fn,
+                #     inputs=[disease_box, *check_boxes],
+                #     outputs=[*check_boxes],
+                # )
 
                 # User symptom vector
-                with gr.Row():
-                    user_vect_box1 = gr.Textbox(label="User Symptoms Vector:", interactive=False)
+                user_vect_box1 = gr.Textbox(label="User Symptoms Vector:", interactive=False)
 
-                with gr.Row():
-                    # Submit botton
-                    submit_button = gr.Button("Submit")
+                # Submit botton
+                submit_button = gr.Button("Submit")
 
                 with gr.Row():
                     # Clear botton
                     clear_button = gr.Button("Reset")
 
                 submit_button.click(
-                    fn=get_features,
+                    fn=get_features_fn,
                     inputs=[*check_boxes],
                     outputs=[user_vect_box1, error_box1],
                 )
+            
             with gr.TabItem("2. Data Encryption") as encryption_tab:
                 gr.Markdown("<span style='color:orange'>Client Side</span>")
                 gr.Markdown("## Step 2: Generate the keys")
@@ -482,14 +548,13 @@ if __name__ == "__main__":
                     with gr.Column(scale=1, min_width=600):
                         key_len_box = gr.Textbox(label="Evaluation Key Size:", interactive=False)
 
-                with gr.Row():
-                    # Evaluation key (truncated)
-                    with gr.Column(scale=2, min_width=600):
-                        key_box = gr.Textbox(
-                            label="Evaluation key (truncated):",
-                            max_lines=2,
-                            interactive=False,
-                        )
+                # Evaluation key (truncated)
+                with gr.Column(scale=2, min_width=600):
+                    key_box = gr.Textbox(
+                        label="Evaluation key (truncated):",
+                        max_lines=3,
+                        interactive=False,
+                    )
 
                 gen_key_btn.click(
                     key_gen_fn,
@@ -553,7 +618,7 @@ if __name__ == "__main__":
                     outputs=[error_box4, srv_resp_send_data_box],
                 )
 
-            with gr.TabItem("3. Processing Data") as fhe_tab:
+            with gr.TabItem("3. FHE execution") as fhe_tab:
                 gr.Markdown("<span style='color:orange'>Client Side</span>")
                 gr.Markdown("## Step 5: Run the FHE evaluation")
 
@@ -569,8 +634,12 @@ if __name__ == "__main__":
                     outputs=[fhe_execution_time_box, error_box5],
                 )
 
+            with gr.TabItem("4. Data Decryption") as decryption_tab:
+
+                gr.Markdown("<span style='color:orange'>Client Side</span>")
+
                 gr.Markdown(
-                    "## Step 6: Get the data from the <span style='color:orange'>Server</span>"
+                    "## Step 6: Get the data from the <span style='color:orange'>Server Side</span>"
                 )
 
                 error_box6 = gr.Textbox(label="Error", visible=False)
@@ -589,8 +658,7 @@ if __name__ == "__main__":
                     outputs=[srv_resp_retrieve_data_box, error_box6],
                 )
 
-            with gr.TabItem("4. Data Decryption") as decryption_tab:
-                gr.Markdown("<span style='color:orange'>Client Side</span>")
+                
                 gr.Markdown("## Step 7: Decrypt the output")
 
                 decrypt_target_btn = gr.Button("Decrypt the output")
@@ -608,7 +676,7 @@ if __name__ == "__main__":
             outputs=[
                 user_vect_box1,
                 user_vect_box2,
-                disease_box,
+                # disease_box,
                 error_box1,
                 error_box2,
                 error_box3,
