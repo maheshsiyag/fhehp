@@ -18,8 +18,8 @@ SERVER_URL = "http://localhost:8000/"
 CURRENT_DIR = Path(__file__).parent
 DEPLOYMENT_DIR = CURRENT_DIR / "deployment"
 KEYS_DIR = DEPLOYMENT_DIR / ".fhe_keys"
-CLIENT_DIR = DEPLOYMENT_DIR / "client"
-SERVER_DIR = DEPLOYMENT_DIR / "server"
+CLIENT_DIR = DEPLOYMENT_DIR / "client_dir"
+SERVER_DIR = DEPLOYMENT_DIR / "server_dir"
 
 ALL_DIRS = [KEYS_DIR, CLIENT_DIR, SERVER_DIR]
 
