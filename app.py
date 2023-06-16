@@ -1,7 +1,7 @@
 import subprocess
 import time
 from pathlib import Path
-from typing import List, Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import gradio as gr
 import numpy as np
@@ -10,10 +10,10 @@ import requests
 from symptoms_categories import SYMPTOMS_LIST
 from utils import (  # pylint: disable=no-name-in-module
     CLIENT_DIR,
+    CURRENT_DIR,
+    DEPLOYMENT_DIR,
     INPUT_BROWSER_LIMIT,
     KEYS_DIR,
-    DEPLOYMENT_DIR,
-    CURRENT_DIR,
     SERVER_URL,
     TARGET_COLUMNS,
     TRAINING_FILENAME,
@@ -290,7 +290,7 @@ def get_output_fn(user_id, user_symptoms):
     ) as response:
         if response.ok:
             print(f"Receive Data: {response.ok=}")
-            
+
             encrypted_output = response.content
 
             # Save the encrypted output to bytes in a file as it is too large to pass through
