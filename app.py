@@ -144,6 +144,7 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
 
     client = FHEModelClient(path_dir=DEPLOYMENT_DIR, key_dir=KEYS_DIR / f"{user_id}")
     client.load()
+    print("CLIENT_LOADED")
 
     # Creates the private and evaluation keys on the client side
     client.generate_private_and_evaluation_keys()
