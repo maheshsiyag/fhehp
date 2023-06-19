@@ -1,4 +1,4 @@
 concrete-ml==1.0.3
-gradio==3.11.0
+gradio==3.35.2
 uvicorn>=0.21.0
 fastapi>=0.93.0

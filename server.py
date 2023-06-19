@@ -32,7 +32,7 @@ def send_input(
     """Send the inputs to the server."""
 
     print("\nSend the data to the server ............\n")
-    
+
     # Receive the Client's files (Evaluation key + Encrypted symptoms)
     evaluation_key_path = SERVER_DIR / f"{user_id}_valuation_key"
     encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_input"
@@ -86,7 +86,7 @@ def get_output(user_id: str = Form()):
     """Retrieve the encrypted output from the server."""
 
     print("\nGet the output from the server ............\n")
-    
+
     # Path where the encrypted output is saved
     encrypted_output_path = SERVER_DIR / f"{user_id}_encrypted_output"
 
