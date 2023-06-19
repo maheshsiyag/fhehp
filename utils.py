@@ -118,7 +118,7 @@ def load_data() -> Tuple[pandas.DataFrame, pandas.DataFrame, numpy.ndarray]:
 
 def load_model(X_train: pandas.DataFrame, y_train: numpy.ndarray):
     """
-    Load a pretrained serialized model
+    Load a pre-trained serialized model
 
     Args:
         X_train (pandas.DataFrame): Training set

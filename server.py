@@ -32,11 +32,12 @@ def send_input(
     """Send the inputs to the server."""
 
     print("\nSend the data to the server ............\n")
-    # Retrieve the encrypted input and the evaluation key paths
+    
+    # Receive the Client's files (Evaluation key + Encrypted symptoms)
     evaluation_key_path = SERVER_DIR / f"{user_id}_valuation_key"
-    encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_symptoms"
+    encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_input"
 
-    # # Write the files using the above paths
+    # Save the files using the above paths
     with encrypted_input_path.open("wb") as encrypted_input, evaluation_key_path.open(
         "wb"
     ) as evaluation_key:
@@ -52,9 +53,9 @@ def run_fhe(
 
     print("\nRun in FHE in the server ............\n")
     evaluation_key_path = SERVER_DIR / f"{user_id}_valuation_key"
-    encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_symptoms"
+    encrypted_input_path = SERVER_DIR / f"{user_id}_encrypted_input"
 
-    # Read the files using the above paths
+    # Read the files (Evaluation key + Encrypted symptoms) using the above paths
     with encrypted_input_path.open("rb") as encrypted_output_file, evaluation_key_path.open(
         "rb"
     ) as evaluation_key_file:
@@ -82,10 +83,11 @@ def run_fhe(
 
 @app.post("/get_output")
 def get_output(user_id: str = Form()):
-    """Retrieve the encrypted output."""
+    """Retrieve the encrypted output from the server."""
 
     print("\nGet the output from the server ............\n")
-    # Retrieve the encrypted output path
+    
+    # Path where the encrypted output is saved
     encrypted_output_path = SERVER_DIR / f"{user_id}_encrypted_output"
 
     # Read the file using the above path
@@ -94,4 +96,5 @@ def get_output(user_id: str = Form()):
 
     time.sleep(1)
 
+    # Send the encrypted output
     return Response(encrypted_output)

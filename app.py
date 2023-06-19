@@ -158,7 +158,7 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
     with evaluation_key_path.open("wb") as f:
         f.write(serialized_evaluation_keys)
 
-    serialized_evaluation_keys_shorten_hex = serialized_evaluation_keys.hex()[:INPUT_BROWSER_LIMIT]   
+    serialized_evaluation_keys_shorten_hex = serialized_evaluation_keys.hex()[:INPUT_BROWSER_LIMIT]
 
     return {
         error_box2: gr.update(visible=False),
@@ -331,8 +331,6 @@ def get_output_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
             )
         }
 
-
-
     data = {
         "user_id": user_id,
     }
@@ -363,7 +361,7 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     Args:
         user_id (int): The current user's ID
         user_symptoms (numpy.ndarray): The user symptoms
-        
+
     Returns:
         Decrypted output
     """
@@ -408,7 +406,6 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     }
 
 
-
 def clear_all_btn():
     """Clear all the box outputs."""
 
@@ -450,7 +447,7 @@ CSS = """
 if __name__ == "__main__":
 
     print("Starting demo ...")
-    
+
     clean_directory()
 
     (X_train, X_test), (y_train, y_test) = load_data()
@@ -510,7 +507,7 @@ if __name__ == "__main__":
                 error_box1 = gr.Textbox(label="Error", visible=False)
 
                 # Default disease, picked from the dataframe
-                # disease_box = gr.Dropdown(list(sorted(set(df_test["prognosis"]))), 
+                # disease_box = gr.Dropdown(list(sorted(set(df_test["prognosis"]))),
                 # label="Disease:")
                 # disease_box.change(
                 #     fn=fill_in_fn,
@@ -533,7 +530,7 @@ if __name__ == "__main__":
                     inputs=[*check_boxes],
                     outputs=[user_vect_box1, error_box1],
                 )
-            
+
             with gr.TabItem("2. Data Encryption") as encryption_tab:
                 gr.Markdown("<span style='color:orange'>Client Side</span>")
                 gr.Markdown("## Step 2: Generate the keys")
@@ -659,7 +656,6 @@ if __name__ == "__main__":
                     outputs=[srv_resp_retrieve_data_box, error_box6],
                 )
 
-                
                 gr.Markdown("## Step 7: Decrypt the output")
 
                 decrypt_target_btn = gr.Button("Decrypt the output")
