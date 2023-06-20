@@ -15,6 +15,7 @@ tags:
   - image processing
   - homomorphic encryption
   - security
+python_version: 3.10.6
 ---
 
 # Healthcare prediction using FHE
