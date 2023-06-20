@@ -1,7 +1,7 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import List, Tuple, Union
 
 import numpy
 import pandas
@@ -87,7 +87,7 @@ def get_disease_name(encoded_prediction: int, file_name: str = TRAINING_FILENAME
     return disease_name
 
 
-def load_data() -> Tuple[pandas.DataFrame, pandas.DataFrame, numpy.ndarray]:
+def load_data() -> Union[Tuple[pandas.DataFrame, numpy.ndarray], List]:
     """
     Return the data
 
@@ -95,7 +95,7 @@ def load_data() -> Tuple[pandas.DataFrame, pandas.DataFrame, numpy.ndarray]:
         None
 
     Return:
-        Tuple[pandas.DataFrame, pandas.DataFrame, numpy.ndarray]: The train and testing set.
+        The train, testing set and valid symptoms.
 
 
     """
@@ -113,7 +113,7 @@ def load_data() -> Tuple[pandas.DataFrame, pandas.DataFrame, numpy.ndarray]:
     y_test = df_test[TARGET_COLUMNS[0]]
     X_test = df_test.drop(columns=TARGET_COLUMNS, axis=1, errors="ignore")
 
-    return (X_train, X_test), (y_train, y_test)
+    return (X_train, X_test), (y_train, y_test), X_train.columns.to_list()
 
 
 def load_model(X_train: pandas.DataFrame, y_train: numpy.ndarray):

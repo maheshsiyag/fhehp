@@ -27,38 +27,39 @@ time.sleep(3)
 # pylint: disable=c-extension-no-member,invalid-name
 
 
-def is_nan(inputs) -> bool:
+def is_none(obj) -> bool:
     """
-    Check if the input is NaN.
+    Check if the object is None.
 
     Args:
-        inputs (any): The input to be checked.
+        obj (any): The input to be checked.
 
     Returns:
-        bool: True if the input is NaN or empty, False otherwise.
+        bool: True if the object is None or empty, False otherwise.
     """
-    return inputs is None or (inputs is not None and len(inputs) < 1)
+    return all((obj is None, (obj is not None and len(obj) < 1)))
 
+
+# <!> This function has been paused due to UI issues.
 
 # def fill_in_fn(default_disease: str, *checkbox_symptoms: Tuple[str]) -> Dict:
 #     """
-#     Fill in the gr.CheckBoxGroup list with the predefined symptoms of a selected default disease.
-
+#     Fill in the gr.CheckBoxGroup list with predefined symptoms of a selected default disease.
 #     Args:
-#         default_disease (str): The default disease
-#         *checkbox_symptoms (Tuple[str]): Tuple of selected symptoms
-
+#         default_disease (str): The default selected disease
+#         *checkbox_symptoms (Tuple[str]): Existing checked symptoms
 #     Returns:
 #         dict: The updated gr.CheckBoxesGroup.
 #     """
+#
+#     # Figure out the symptoms of the disease, selected by the user
 #     df = pd.read_csv(TRAINING_FILENAME)
 #     df_filtred = df[df[TARGET_COLUMNS[1]] == default_disease]
 #     symptoms = pretty_print(df_filtred.columns[df_filtred.eq(1).any()].to_list())
-
+#     # Check if there are existing symptoms, in the CheckbBxGroup list
 #     if any(lst for lst in checkbox_symptoms if lst):
 #         for sublist in checkbox_symptoms:
 #             symptoms.extend(sublist)
-
 #     return {box: symptoms for box in check_boxes}
 
 
@@ -67,7 +68,7 @@ def get_user_symptoms_from_checkboxgroup(checkbox_symptoms: List) -> np.array:
     Convert the user symptoms into a binary vector representation.
 
     Args:
-        checkbox_symptoms (list): A list of user symptoms.
+        checkbox_symptoms (List): A list of user symptoms.
 
     Returns:
         np.array: A binary vector representing the user's symptoms.
@@ -76,7 +77,7 @@ def get_user_symptoms_from_checkboxgroup(checkbox_symptoms: List) -> np.array:
         KeyError: If a provided symptom is not recognized as a valid symptom.
 
     """
-    symptoms_vector = {key: 0 for key in valid_columns}
+    symptoms_vector = {key: 0 for key in valid_symptoms}
     for pretty_symptom in checkbox_symptoms:
         original_symptom = "_".join((pretty_symptom.lower().split(" ")))
         if original_symptom not in symptoms_vector.keys():
@@ -130,10 +131,10 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
     """
     clean_directory()
 
-    if is_nan(user_symptoms):
+    if is_none(user_symptoms):
         print("Error: Please submit your symptoms or select a default disease.")
         return {
-            error_box2: gr.update(visible=True, value="Please submit your symptoms first"),
+            error_box2: gr.update(visible=True, value="Please submit your symptoms first!."),
         }
 
     # Generate a random user ID
@@ -142,7 +143,6 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
 
     client = FHEModelClient(path_dir=DEPLOYMENT_DIR, key_dir=KEYS_DIR / f"{user_id}")
     client.load()
-    print("CLIENT_LOADED")
 
     # Creates the private and evaluation keys on the client side
     client.generate_private_and_evaluation_keys()
@@ -175,7 +175,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
         user_id (user): The current user's ID
     """
 
-    if is_nan(user_id) or is_nan(user_symptoms):
+    if is_none(user_id) or is_none(user_symptoms):
         print("Error in encryption step: Provide your symptoms and generate the evaluation keys.")
         return {
             error_box3: gr.update(
@@ -192,7 +192,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
 
     encrypted_quantized_user_symptoms = client.quantize_encrypt_serialize(user_symptoms)
     assert isinstance(encrypted_quantized_user_symptoms, bytes)
-    encrypted_input_path = KEYS_DIR / f"{user_id}/encrypted_symptoms"
+    encrypted_input_path = KEYS_DIR / f"{user_id}/encrypted_input"
 
     with encrypted_input_path.open("wb") as f:
         f.write(encrypted_quantized_user_symptoms)
@@ -213,11 +213,11 @@ def send_input_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     """Send the encrypted data and the evaluation key to the server.
 
     Args:
-        user_id (int): The current user's ID
-        user_symptoms (numpy.ndarray): The user symptoms
+        user_id (str): The current user's ID
+        user_symptoms (np.ndarray): The user symptoms
     """
 
-    if is_nan(user_id) or is_nan(user_symptoms):
+    if is_none(user_id) or is_none(user_symptoms):
         return {
             error_box4: gr.update(
                 visible=True,
@@ -227,7 +227,7 @@ def send_input_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
         }
 
     evaluation_key_path = KEYS_DIR / f"{user_id}/evaluation_key"
-    encrypted_input_path = KEYS_DIR / f"{user_id}/encrypted_symptoms"
+    encrypted_input_path = KEYS_DIR / f"{user_id}/encrypted_input"
 
     if not evaluation_key_path.is_file():
         print(
@@ -252,7 +252,7 @@ def send_input_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     # Define the data and files to post
     data = {
         "user_id": user_id,
-        "filter": user_symptoms,
+        "input": user_symptoms,
     }
 
     files = [
@@ -268,18 +268,20 @@ def send_input_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
         files=files,
     ) as response:
         print(f"Sending Data: {response.ok=}")
-    return {error_box4: gr.update(visible=False),
-    
-    next_step_tab3: gr.update(visible=True),srv_resp_send_data_box: "Data sent",}
+    return {
+        error_box4: gr.update(visible=False),
+        next_step_tab3: gr.update(visible=True),
+        srv_resp_send_data_box: "Data sent",
+    }
 
 
 def run_fhe_fn(user_id: str) -> Dict:
-    """Send the encrypted input as well as the evaluation key to the server.
+    """Send the encrypted input and the evaluation key to the server.
 
     Args:
         user_id (int): The current user's ID.
     """
-    if is_nan(user_id):  # or is_nan(user_symptoms):
+    if is_none(user_id):
         return {
             error_box5: gr.update(
                 visible=True,
@@ -292,8 +294,6 @@ def run_fhe_fn(user_id: str) -> Dict:
         "user_id": user_id,
     }
 
-    # Trigger the FHE execution on the encrypted previously sent
-
     url = SERVER_URL + "run_fhe"
 
     with requests.post(
@@ -302,7 +302,13 @@ def run_fhe_fn(user_id: str) -> Dict:
     ) as response:
         if not response.ok:
             return {
-                error_box5: gr.update(visible=True, value="Please wait."),
+                error_box5: gr.update(
+                    visible=True,
+                    value=(
+                        "An error occurred on the Server Side. "
+                        "Please check connectivity and data transmission."
+                    ),
+                ),
                 fhe_execution_time_box: gr.update(visible=True),
             }
         else:
@@ -311,7 +317,7 @@ def run_fhe_fn(user_id: str) -> Dict:
     return {
         error_box5: gr.update(visible=False),
         fhe_execution_time_box: gr.update(value=f"{response.json()} seconds"),
-        next_step_tab4: gr.update(visible=True)
+        next_step_tab4: gr.update(visible=True),
     }
 
 
@@ -319,11 +325,11 @@ def get_output_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     """Retreive the encrypted data from the server.
 
     Args:
-        user_id (int): The current user's ID
-        user_symptoms (numpy.ndarray): The user symptoms
+        user_id (str): The current user's ID
+        user_symptoms (np.ndarray): The user symptoms
     """
 
-    if is_nan(user_id) or is_nan(user_symptoms):
+    if is_none(user_id) or is_none(user_symptoms):
         return {
             error_box6: gr.update(
                 visible=True,
@@ -360,14 +366,14 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     """Dencrypt the data on the `Client Side`.
 
     Args:
-        user_id (int): The current user's ID
-        user_symptoms (numpy.ndarray): The user symptoms
+        user_id (str): The current user's ID
+        user_symptoms (np.ndarray): The user symptoms
 
     Returns:
         Decrypted output
     """
 
-    if is_nan(user_id) or is_nan(user_symptoms):
+    if is_none(user_id) or is_none(user_symptoms):
         return {
             error_box7: gr.update(
                 visible=True,
@@ -377,7 +383,6 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
         }
 
     # Get the encrypted output path
-
     encrypted_output_path = CLIENT_DIR / f"{user_id}_encrypted_output"
 
     if not encrypted_output_path.is_file():
@@ -398,6 +403,7 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     # Retrieve the client API
     client = FHEModelClient(path_dir=DEPLOYMENT_DIR, key_dir=KEYS_DIR / f"{user_id}")
     client.load()
+
     # Deserialize, decrypt and post-process the encrypted output
     output = client.deserialize_decrypt_dequantize(encrypted_output)
 
@@ -408,7 +414,7 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
 
 
 def reset_fn():
-    """Clear all the box outputs."""
+    """Reset the space and clear all the box outputs."""
 
     clean_directory()
 
@@ -455,9 +461,7 @@ if __name__ == "__main__":
 
     clean_directory()
 
-    (X_train, X_test), (y_train, y_test) = load_data()
-
-    valid_columns = X_train.columns.to_list()
+    (X_train, X_test), (y_train, y_test), valid_symptoms = load_data()
 
     with gr.Blocks(css=CSS) as demo:
 
@@ -512,6 +516,8 @@ if __name__ == "__main__":
 
                 error_box1 = gr.Textbox(label="Error", visible=False)
 
+                # <!> This part has been paused due to UI issues.
+
                 # Default disease, picked from the dataframe
                 # disease_box = gr.Dropdown(list(sorted(set(df_test["prognosis"]))),
                 # label="Disease:")
@@ -535,7 +541,8 @@ if __name__ == "__main__":
                     <p align="center">
                     <img width="80%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/Go-To-Step2.png">
                     </p>
-                    """, visible=False
+                    """,
+                    visible=False,
                 )
 
                 submit_button.click(
@@ -628,7 +635,8 @@ if __name__ == "__main__":
                     <p align="center">
                     <img width="80%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/Go-To-Step3.png">
                     </p>
-                    """, visible=False
+                    """,
+                    visible=False,
                 )
 
                 send_input_btn.click(
@@ -652,7 +660,8 @@ if __name__ == "__main__":
                     <p align="center">
                     <img width="80%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/Go-to-Step4.png">
                     </p>
-                    """, visible=False
+                    """,
+                    visible=False,
                 )
                 run_fhe_btn.click(
                     run_fhe_fn,
