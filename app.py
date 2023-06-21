@@ -323,7 +323,6 @@ def run_fhe_fn(user_id: str) -> Dict:
     return {
         error_box5: gr.update(visible=False),
         fhe_execution_time_box: gr.update(value=f"{response.json()} seconds"),
-        next_step_tab4: gr.update(visible=True),
     }
 
 
@@ -445,9 +444,6 @@ def reset_fn():
         error_box4: gr.update(visible=False),
         error_box5: gr.update(visible=False),
         error_box6: gr.update(visible=False),
-        next_step_tab2: gr.update(visible=False),
-        next_step_tab3: gr.update(visible=False),
-        next_step_tab4: gr.update(visible=False),
         srv_resp_send_data_box: None,
         srv_resp_retrieve_data_box: None,
         **{box: None for box in check_boxes},
