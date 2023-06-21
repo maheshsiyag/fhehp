@@ -111,10 +111,17 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
             ),
         }
 
+    if len(pretty_print(checked_symptoms)) < 5:
+        print("Provide at least 5 symptoms.")
+        return {
+            error_box1: gr.update(visible=True, value="Provide at least 5 symptoms"),
+            user_vect_box1: get_user_symptoms_from_checkboxgroup([]),
+        }
+
+
     return {
         error_box1: gr.update(visible=False),
         user_vect_box1: get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
-        next_step_tab2: gr.update(visible=True),
     }
 
 
@@ -270,7 +277,6 @@ def send_input_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
         print(f"Sending Data: {response.ok=}")
     return {
         error_box4: gr.update(visible=False),
-        next_step_tab3: gr.update(visible=True),
         srv_resp_send_data_box: "Data sent",
     }
 
@@ -407,6 +413,9 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     # Deserialize, decrypt and post-process the encrypted output
     output = client.deserialize_decrypt_dequantize(encrypted_output)
 
+
+    print(output)
+
     return {
         error_box7: gr.update(visible=False),
         decrypt_target_box: get_disease_name(output.argmax()),
@@ -444,14 +453,19 @@ def reset_fn():
         **{box: None for box in check_boxes},
     }
 
+def change_tab(next_tab):
+    print(next_tab)
+    return gr.Tabs.update(selected=next_tab)
 
 CSS = """
-#them {color: orange} 
-#them {font-size: 25px} 
-#them {font-weight: bold} 
+/* #them {color: dark-yellow} */
+/* #them {font-size: 25px}  */
+/* #them {font-weight: bold}  */
 .gradio-container {background-color: white}
-.feedback {font-size: 3px !important}
-/* .svelte-s1r2yt {color: orange; font-size: 25px, font-weight: bold;} */
+/* .feedback {font-size: 3px !important} */
+#svelte-s1r2yt {color: orange}
+#svelte-s1r2yt {font-size: 25px}
+#svelte-s1r2yt {font-weight: bold}
 /* #them {text-align: center} */
 """
 
@@ -490,8 +504,8 @@ if __name__ == "__main__":
             """
         )
 
-        with gr.Tabs(elem_id="them"):
-            with gr.TabItem("1. Symptoms Selection") as feature:
+        with gr.Tabs(eelem_id ="svelte-s1r2yt", lem_classes="svelte-s1r2yt") as tabs:
+            with gr.TabItem("1. Symptoms Selection", id=0):
                 gr.Markdown("<span style='color:orange'>Client Side</span>")
                 gr.Markdown("## Step 1: Provide your symptoms")
                 gr.Markdown(
@@ -533,25 +547,19 @@ if __name__ == "__main__":
                 # Submit botton
                 submit_button = gr.Button("Submit")
 
-                # Clear botton
-                clear_button = gr.Button("Reset Space")
-
-                next_step_tab2 = gr.Markdown(
-                    """
-                    <p align="center">
-                    <img width="80%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/Go-To-Step2.png">
-                    </p>
-                    """,
-                    visible=False,
-                )
-
                 submit_button.click(
                     fn=get_features_fn,
                     inputs=[*check_boxes],
-                    outputs=[user_vect_box1, error_box1, next_step_tab2],
+                    outputs=[user_vect_box1, error_box1],
                 )
 
-            with gr.TabItem("2. Data Encryption") as encryption_tab:
+                # Clear botton
+                clear_button = gr.Button("Reset Space")
+
+                next_tab = gr.Button('Next Step')
+                next_tab.click(lambda _:gr.Tabs.update(selected=1), None, tabs)
+                
+            with gr.TabItem("2. Data Encryption", id=1):
                 gr.Markdown("<span style='color:orange'>Client Side</span>")
                 gr.Markdown("## Step 2: Generate the keys")
 
@@ -589,6 +597,7 @@ if __name__ == "__main__":
 
                 encrypt_btn = gr.Button("Encrypt the symptoms with the private key")
                 error_box3 = gr.Textbox(label="Error", visible=False)
+
 
                 with gr.Row():
                     with gr.Column(scale=1, min_width=600):
@@ -630,22 +639,24 @@ if __name__ == "__main__":
                             label="Data Sent", show_label=False, interactive=False
                         )
 
-                next_step_tab3 = gr.Markdown(
-                    """
-                    <p align="center">
-                    <img width="80%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/Go-To-Step3.png">
-                    </p>
-                    """,
-                    visible=False,
-                )
-
                 send_input_btn.click(
                     send_input_fn,
                     inputs=[user_id_box, user_vect_box1],
-                    outputs=[error_box4, srv_resp_send_data_box, next_step_tab3],
+                    outputs=[error_box4, srv_resp_send_data_box],
                 )
+                
+                with gr.Row().style(equal_height=True):
+                    with gr.Column(scale=1):
+                        prev_tab = gr.Button('Previous Step')
+                        prev_tab.click(lambda _:gr.Tabs.update(selected=0), None, tabs)
 
-            with gr.TabItem("3. FHE execution") as fhe_tab:
+                    with gr.Column(scale=1):
+                        next_tab = gr.Button('Next Step')
+                        next_tab.click(lambda _:gr.Tabs.update(selected=2), None, tabs)
+                
+
+
+            with gr.TabItem("3. FHE execution", id=2):
                 gr.Markdown("<span style='color:orange'>Server Side</span>")
                 gr.Markdown("## Step 5: Run the FHE evaluation")
 
@@ -655,21 +666,24 @@ if __name__ == "__main__":
                     label="Total FHE Execution Time:", interactive=False
                 )
 
-                next_step_tab4 = gr.Markdown(
-                    """
-                    <p align="center">
-                    <img width="80%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/Go-to-Step4.png">
-                    </p>
-                    """,
-                    visible=False,
-                )
                 run_fhe_btn.click(
                     run_fhe_fn,
                     inputs=[user_id_box],
-                    outputs=[fhe_execution_time_box, error_box5, next_step_tab4],
+                    outputs=[fhe_execution_time_box, error_box5],
                 )
 
-            with gr.TabItem("4. Data Decryption") as decryption_tab:
+                with gr.Row().style(equal_height=True):
+                    with gr.Column(scale=1):
+                        prev_tab = gr.Button('Previous Step')
+                        prev_tab.click(lambda _: gr.Tabs.update(selected=1), None, tabs)
+
+                    with gr.Column(scale=1):
+                        next_tab = gr.Button('Next Step')
+                        next_tab.click(lambda _: gr.Tabs.update(selected=3), None, tabs)
+                
+
+
+            with gr.TabItem("4. Data Decryption", id=3):
                 gr.Markdown("<span style='color:orange'>Client Side</span>")
                 gr.Markdown(
                     "## Step 6: Get the data from the <span style='color:orange'>Server Side</span>"
@@ -703,14 +717,13 @@ if __name__ == "__main__":
                     outputs=[decrypt_target_box, error_box7],
                 )
 
+                prev_tab = gr.Button('Previous Step')
+                prev_tab.click(lambda _:gr.Tabs.update(selected=2), None, tabs)
+
         clear_button.click(
             reset_fn,
             outputs=[
-                next_step_tab2,
-                next_step_tab3,
-                next_step_tab4,
-                user_vect_box1,
-                user_vect_box2,
+
                 # disease_box,
                 error_box1,
                 error_box2,
