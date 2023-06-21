@@ -16,7 +16,7 @@ INPUT_BROWSER_LIMIT = 635
 SERVER_URL = "http://localhost:8000/"
 
 CURRENT_DIR = Path(__file__).parent
-DEPLOYMENT_DIR = CURRENT_DIR / "deployment"
+DEPLOYMENT_DIR = CURRENT_DIR / "deployment4"
 KEYS_DIR = DEPLOYMENT_DIR / ".fhe_keys"
 CLIENT_DIR = DEPLOYMENT_DIR / "client_dir"
 SERVER_DIR = DEPLOYMENT_DIR / "server_dir"

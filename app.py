@@ -2,7 +2,7 @@ import subprocess
 import time
 from typing import Dict, List, Tuple
 
-import gradio as gr
+import gradio as gr # pylint: disable=import-error
 import numpy as np
 import requests
 from symptoms_categories import SYMPTOMS_LIST
@@ -412,7 +412,6 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     # Deserialize, decrypt and post-process the encrypted output
     output = client.deserialize_decrypt_dequantize(encrypted_output)
 
-
     print(output)
 
     return {
@@ -719,7 +718,8 @@ if __name__ == "__main__":
         clear_button.click(
             reset_fn,
             outputs=[
-
+                user_vect_box1,
+                user_vect_box2,
                 # disease_box,
                 error_box1,
                 error_box2,
