@@ -16,7 +16,7 @@ INPUT_BROWSER_LIMIT = 635
 SERVER_URL = "http://localhost:8000/"
 
 CURRENT_DIR = Path(__file__).parent
-DEPLOYMENT_DIR = CURRENT_DIR / "deployment4"
+DEPLOYMENT_DIR = CURRENT_DIR / "deployment_logit_11"
 KEYS_DIR = DEPLOYMENT_DIR / ".fhe_keys"
 CLIENT_DIR = DEPLOYMENT_DIR / "client_dir"
 SERVER_DIR = DEPLOYMENT_DIR / "server_dir"
@@ -31,8 +31,12 @@ TESTING_FILENAME = "./data/Testing_preprocessed.csv"
 
 # pylint: disable=invalid-name
 
+from typing import List, Tuple
 
-def pretty_print(inputs):
+
+def pretty_print(
+    inputs, case_conversion=str.title, which_replace: str = "_", to_what: str = " ", delimiter=None
+):
     """
     Prettify and sort the input as a list of string.
 
@@ -43,20 +47,21 @@ def pretty_print(inputs):
         List: The prettified and sorted list of inputs.
 
     """
-    # Convert to a list if necessary
-    if not isinstance(inputs, (List, Tuple)):
-        inputs = list(inputs)
-
     # Flatten the list if required
     pretty_list = []
     for item in inputs:
         if isinstance(item, list):
-            pretty_list.extend([" ".join(subitem.split("_")).title() for subitem in item])
+            pretty_list.extend(item)
         else:
-            pretty_list.append(" ".join(item.split("_")).title())
+            pretty_list.append(item)
 
-    # Sort and prettify the input
+    # Sort
     pretty_list = sorted(list(set(pretty_list)))
+    # Replace
+    pretty_list = [item.replace(which_replace, to_what) for item in pretty_list]
+    pretty_list = [case_conversion(item) for item in pretty_list]
+    if delimiter:
+        pretty_list = f"{delimiter.join(pretty_list)}."
 
     return pretty_list
 
@@ -113,7 +118,12 @@ def load_data() -> Union[Tuple[pandas.DataFrame, numpy.ndarray], List]:
     y_test = df_test[TARGET_COLUMNS[0]]
     X_test = df_test.drop(columns=TARGET_COLUMNS, axis=1, errors="ignore")
 
-    return (X_train, X_test), (y_train, y_test), X_train.columns.to_list()
+    return (
+        (X_train, X_test),
+        (y_train, y_test),
+        X_train.columns.to_list(),
+        df_train[TARGET_COLUMNS[1]].unique().tolist(),
+    )
 
 
 def load_model(X_train: pandas.DataFrame, y_train: numpy.ndarray):

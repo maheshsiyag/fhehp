@@ -6,7 +6,7 @@ colorTo: blue
 sdk: gradio
 sdk_version: 3.33.1
 app_file: app.py
-pinned: True
+pinned: true
 tags:
   - FHE
   - PPML
@@ -22,7 +22,7 @@ python_version: 3.10.6
 
 ## Running the application on your machine
 
-From this directory, i.e. `health_prediction`, you can proceed with the following steps.
+From this directory, i.e., `health_prediction`, you can proceed with the following steps.
 
 ### Do once
 

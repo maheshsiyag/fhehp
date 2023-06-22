@@ -7,16 +7,16 @@ Each variable contains a list of symptoms sthat can be pecific to a part of the 
 of similar symptoms.
 """
 
-DIGESTIVE_SYSTEM_SYPTOMS = {
-    "Digestive_system_symptoms": [
+
+DIGESTIVE_SYSTEM_SYMPTOMS = {
+    "DIGESTIVE_SYSTEM_CONCERNS": [
         "stomach_pain",
         "acidity",
         "vomiting",
         "indigestion",
         "constipation",
         "abdominal_pain",
-        "diarrhoea",
-        "belly_pain",
+        "diarrhea",
         "nausea",
         "distention_of_abdomen",
         "stomach_bleeding",
@@ -33,8 +33,8 @@ DIGESTIVE_SYSTEM_SYPTOMS = {
     ]
 }
 
-SKIN_SYPTOMS = {
-    "Skin_related_symptoms": [
+SKIN_SYMPTOMS = {
+    "SKIN_CONCERNS": [
         "itching",
         "skin_rash",
         "pus_filled_pimples",
@@ -50,11 +50,12 @@ SKIN_SYPTOMS = {
         "yellow_crust_ooze",
         "dischromic_patches",
         "nodal_skin_eruptions",
+        "toxic_look_(typhus)",
     ]
 }
 
 ORL_SYMPTOMS = {
-    "ORL_SYMPTOMS": [
+    "ORL_CONCERNS": [
         "loss_of_smell",
         "continuous_sneezing",
         "runny_nose",
@@ -70,7 +71,7 @@ ORL_SYMPTOMS = {
 }
 
 THORAX_SYMPTOMS = {
-    "THORAX_RELATED_SYMPTOMS": [
+    "THORAX_CONCERNS": [
         "breathlessness",
         "chest_pain",
         "cough",
@@ -84,7 +85,7 @@ THORAX_SYMPTOMS = {
 }
 
 EYES_SYMPTOMS = {
-    "Eyes_related_symptoms": [
+    "EYES_CONCERNS": [
         "sunken_eyes",
         "redness_of_eyes",
         "watering_from_eyes",
@@ -95,7 +96,7 @@ EYES_SYMPTOMS = {
 }
 
 VASCULAR_LYMPHATIC_SYMPTOMS = {
-    "VASCULAR_LYMPHATIC_SYMPTOMS": [
+    "VASCULAR_LYMPHATIC_CONCERNS": [
         "cold_hands_and_feets",
         "swollen_blood_vessels",
         "swollen_legs",
@@ -104,14 +105,13 @@ VASCULAR_LYMPHATIC_SYMPTOMS = {
         "prominent_veins_on_calf",
         "yellowing_of_eyes",
         "puffy_face_and_eyes",
-        "fluid_overload",
-        "fluid_overload.1",
+        "severe_fluid_overload",
         "swollen_extremeties",
     ]
 }
 
 UROLOGICAL_SYMPTOMS = {
-    "UROLOGICAL_SYMPTOMS": [
+    "UROLOGICAL_CONCERNS": [
         "burning_micturition",
         "spotting_urination",
         "yellow_urine",
@@ -124,7 +124,7 @@ UROLOGICAL_SYMPTOMS = {
 }
 
 MUSCULOSKELETAL_SYMPTOMS = {
-    "MUSCULOSKELETAL_SYMPTOMS": [
+    "MUSCULOSKELETAL_CONCERNS": [
         "joint_pain",
         "muscle_wasting",
         "muscle_pain",
@@ -143,13 +143,12 @@ MUSCULOSKELETAL_SYMPTOMS = {
     ]
 }
 
-FEELING_SYMPTOMS = {
-    "FEELING_SYMPTOMS": [
+GENERAL_SYMPTOMS = {
+    "GENERAL_CONCERNS": [
         "anxiety",
         "restlessness",
         "lethargy",
         "mood_swings",
-        "depression",
         "irritability",
         "lack_of_concentration",
         "fatigue",
@@ -158,13 +157,8 @@ FEELING_SYMPTOMS = {
         "increased_appetite",
         "weight_loss",
         "loss_of_appetite",
-        "obesity",
+        "excess_body_fat",
         "excessive_hunger",
-    ]
-}
-
-OTHER_SYMPTOMS = {
-    "OTHER_SYMPTOMS": [
         "ulcers_on_tongue",
         "shivering",
         "chills",
@@ -174,36 +168,27 @@ OTHER_SYMPTOMS = {
         "sweating",
         "internal_itching",
         "mild_fever",
-        "toxic_look_(typhos)",
         "acute_liver_failure",
         "dehydration",
         "headache",
-        "extra_marital_contacts",
+        "frequent_unprotected_sexual_intercourse_with_multiple_partners",
         "drying_and_tingling_lips",
         "altered_sensorium",
-    ]
-}
-
-PATIENT_HISTORY = {
-    "PATIENT_HISTORY": [
         "family_history",
         "receiving_blood_transfusion",
         "receiving_unsterile_injections",
-        "history_of_alcohol_consumption",
-        "coma",
+        "chronic_alcohol_abuse",
     ]
 }
 
 SYMPTOMS_LIST = [
-    SKIN_SYPTOMS,
+    SKIN_SYMPTOMS,
     EYES_SYMPTOMS,
     ORL_SYMPTOMS,
     THORAX_SYMPTOMS,
-    DIGESTIVE_SYSTEM_SYPTOMS,
+    DIGESTIVE_SYSTEM_SYMPTOMS,
     UROLOGICAL_SYMPTOMS,
     VASCULAR_LYMPHATIC_SYMPTOMS,
     MUSCULOSKELETAL_SYMPTOMS,
-    FEELING_SYMPTOMS,
-    PATIENT_HISTORY,
-    OTHER_SYMPTOMS,
+    GENERAL_SYMPTOMS,
 ]
