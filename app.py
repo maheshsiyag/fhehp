@@ -536,20 +536,28 @@ CSS = """
 </button>
 
 """
-back_to_top_btn_html = """
-<button id="toTopBtn" onclick="scrollToTop()">
-    <a style="color:white; text-decoration:none;">Back to Top!</a>
-</button>
+back_to_top_btn_html = '''
+<button id="toTopBtn" onclick="'parentIFrame' in window ? window.parentIFrame.scrollTo({top: 0, behavior:'smooth'}) : window.scrollTo({ top: 0 })">
+<a style="color:white; text-decoration:none;">Back to Top!</a>
+</button>'''
 
-<script>
-    function scrollToTop() {
-        var element = document.getElementById('toTopBtn');
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-</script>
-
-
-"""
+style="""
+#toTopBtn {
+	position: fixed;
+        bottom: 10px;
+        float: right;
+        right: 18.5%;
+        left: 77.25%;
+	height: 30px;
+        max-width: 100px;
+        width: 100%;
+        font-size: 12px;
+        border-color: rgba(217,24,120, .5);
+        background-color: rgba(35,153,249,.5);
+        padding: .5px;
+        border-radius: 4px;
+   }
+   """
 
 if __name__ == "__main__":
 
@@ -559,7 +567,7 @@ if __name__ == "__main__":
 
     (X_train, X_test), (y_train, y_test), valid_symptoms, diseases = load_data()
 
-    with gr.Blocks(css=CSS) as demo:
+    with gr.Blocks(css=style) as demo:
         gr.HTML(back_to_top_btn_html)
 
         # Link + images
