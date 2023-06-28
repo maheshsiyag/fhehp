@@ -528,9 +528,17 @@ CSS = """
 /* #them {text-align: center} */
 """
 
-back_to_top_btn_html = """
+
+"""
+
 <button id="toTopBtn" onclick="'parentIFrame' in window ? window.parentIFrame.scrollTo({top: 0, behavior:'smooth'}) : window.scrollTo({ top: 0 })">
 <a style="color:white; text-decoration:none;">Back to Top!</a>
+</button>
+
+"""
+back_to_top_btn_html = """
+<button id="toTopBtn" onclick="window.parent.postMessage('scrollToTop', '*')">
+    <a style="color:white; text-decoration:none;">Back to Top!</a>
 </button>
 """
 
