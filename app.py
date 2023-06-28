@@ -537,9 +537,22 @@ CSS = """
 
 """
 back_to_top_btn_html = """
-<button id="toTopBtn" onclick="window.parent.postMessage('scrollToTop', '*')">
+<button id="toTopBtn" onclick="scrollToTop()">
     <a style="color:white; text-decoration:none;">Back to Top!</a>
 </button>
+
+<script>
+    function scrollToTop() {
+        if ('parentIFrame' in window) {
+            var iframe = window.parentIFrame;
+            var element = document.getElementById('toTopBtn');
+            iframe.moveToAnchor('toTopBtn', element);
+        } else {
+            window.scroll({ top: 0, behavior: 'smooth' });
+        }
+    }
+</script>
+
 """
 
 if __name__ == "__main__":
