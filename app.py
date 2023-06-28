@@ -538,15 +538,17 @@ CSS = """
 """
 back_to_top_btn_html = '''
 
-<a href="#top" style="color:white; text-decoration:none;">
-  <button style="display: block; background-color: transparent; border: none; padding: 0; cursor: pointer;">
-    Back to Top!
-  </button>
-</a>
+<script>
+const element = document.getElementById("content");
 
-<!-- Place this element at the top of your page -->
-<div id="top"></div>
+function scrollToTop() {
+  element.scrollIntoView(true);
+}
 
+function scrollToBottom() {
+  element.scrollIntoView(false);
+}
+</script>
 
 '''
 
