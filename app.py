@@ -542,15 +542,12 @@ back_to_top_btn_html = """
 </button>
 
 <script>
-    function scrollToTop() {
-        if ('parentIFrame' in window) {
-            var iframe = window.parentIFrame;
-            var element = document.getElementById('toTopBtn');
-            iframe.moveToAnchor('toTopBtn', element);
-        } else {
-            window.scroll({ top: 0, behavior: 'smooth' });
-        }
+window.addEventListener('message', function(event) {
+    if (event.data === 'scrollToTop') {
+        var iframe = document.getElementById('your-iframe-id'); // replace with your iframe's id
+        iframe.scrollIntoView(true);
     }
+});
 </script>
 
 """
