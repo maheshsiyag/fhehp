@@ -565,8 +565,7 @@ if __name__ == "__main__":
 
     (X_train, X_test), (y_train, y_test), valid_symptoms, diseases = load_data()
 
-    with gr.Blocks(css=CSS) as demo:
-        gr.HTML(back_to_top_btn_html)
+    with gr.Blocks(css="#box { height: 500px; overflow-y: scroll !important}") as demo:
 
         # Link + images
         gr.Markdown(
