@@ -538,17 +538,22 @@ CSS = """
 """
 back_to_top_btn_html = '''
 
+<button onclick="scrollToTop()" style="color:white; text-decoration:none;">
+  Back to Top!
+</button>
+
 <script>
-const element = document.getElementById("content");
-
 function scrollToTop() {
-  element.scrollIntoView(true);
-}
-
-function scrollToBottom() {
-  element.scrollIntoView(false);
+  // Check if the parentIFrame exists and use it for scrolling if available
+  if ('parentIFrame' in window) {
+    window.parentIFrame.scrollTo({top: 0, behavior: 'smooth'});
+  } else {
+    // Use the standard scrollIntoView method for scrolling
+    document.documentElement.scrollIntoView({behavior: 'smooth'});
+  }
 }
 </script>
+
 
 '''
 
