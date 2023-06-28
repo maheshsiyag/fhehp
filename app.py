@@ -538,16 +538,25 @@ CSS = """
 """
 back_to_top_btn_html = '''
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.1/iframeResizer.min.js"></script>
-<iframe id="myIframe" src="iframe.html" style="width:1px;min-width:100%;" frameborder="0" scrolling="no"></iframe>
+<button onclick="scrollToTop()">Scroll to Top</button>
+<button onclick="scrollToBottom()">Scroll to Bottom</button>
+
+<div id="content">
+  <!-- Content goes here -->
+</div>
 
 <script>
-    iFrameResize({ log: false }, '#myIframe')
+  function scrollToTop() {
+    const element = document.getElementById("content");
+    element.scrollIntoView(true);
+  }
+
+  function scrollToBottom() {
+    const element = document.getElementById("content");
+    element.scrollIntoView(false);
+  }
 </script>
 
-<button id="toTopBtn" onclick="window.parent.postMessage('scrollToTop', '*')">
-    <a style="color:white; text-decoration:none;">Back to Top!</a>
-</button>
 '''
 
 if __name__ == "__main__":
