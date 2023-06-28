@@ -144,12 +144,10 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
     return {
         error_box1: gr.update(visible=False),
         user_vect_box1: gr.update(
-            visible=True, value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms))
+            visible=False,
+            value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
-        recap_symptoms_box: gr.update(
-            visible=True,
-            value=pretty_print(checked_symptoms, case_conversion=str.capitalize, delimiter=", "),
-        ),
+        submit_button: gr.update(value="Data Submitted ✅"),
     }
 
 
@@ -242,8 +240,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
 
     return {
         error_box3: gr.update(visible=False),
-        user_vect_box2: gr.update(visible=False, value=user_symptoms),
-        quant_vect_box: gr.update(visible=False, value=quant_user_symptoms),
+        user_vect_box2: gr.update(visible=True, value=user_symptoms),
         enc_vect_box: gr.update(visible=True, value=encrypted_quantized_user_symptoms_shorten_hex),
     }
 
@@ -406,7 +403,9 @@ def get_output_fn(user_id: str, user_symptoms: np.ndarray) -> Dict:
     return {error_box6: gr.update(visible=False), srv_resp_retrieve_data_box: "Data received"}
 
 
-def decrypt_fn(user_id: str, user_symptoms: np.ndarray, threshold: int = 0.5) -> Dict:
+def decrypt_fn(
+    user_id: str, user_symptoms: np.ndarray, *checked_symptoms, threshold: int = 0.5
+) -> Dict:
     """Dencrypt the data on the `Client Side`.
 
     Args:
@@ -464,15 +463,15 @@ def decrypt_fn(user_id: str, user_symptoms: np.ndarray, threshold: int = 0.5) ->
         or (np.sum(top3_proba) < threshold)
         or (abs(top3_proba[0] - top3_proba[1]) < threshold)
     ):
-        out = (
-            "The prediction appears uncertain; including more symptoms may improve the results.\n\n"
-            "Here are the top3 predictions:"
-        )
+        out = "⚠️ The prediction appears uncertain; including more symptoms may improve the results.\n\n"
+
     else:
-        out = "Based on the information provided, here are the top3 predictions:"
+        out = ""
 
     out = (
-        f"{out}\n\n"
+        f"{out}"
+        f"Given the symptoms you provided: {pretty_print(checked_symptoms, case_conversion=str.capitalize, delimiter=', ')}\n\n"
+        "Here are the top3 predictions:\n\n"
         f"1. « {get_disease_name(top3_diseases[0])} » with a probability of {top3_proba[0]:.2%}\n"
         f"2. « {get_disease_name(top3_diseases[1])} » with a probability of {top3_proba[1]:.2%}\n"
         f"3. « {get_disease_name(top3_diseases[2])} » with a probability of {top3_proba[2]:.2%}\n"
@@ -490,12 +489,13 @@ def reset_fn():
     clean_directory()
 
     return {
+        user_vect_box2: None,
+        submit_button: gr.update(value="Confirm Symptoms"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
         user_vect_box1: None,
         recap_symptoms_box: gr.update(visible=False, value=None),
         default_symptoms: gr.update(visible=True, value=None),
         disease_box: gr.update(visible=True, value=None),
-        user_vect_box2: gr.update(visible=False, value=None, interactive=False),
         quant_vect_box: gr.update(visible=False, value=None, interactive=False),
         enc_vect_box: gr.update(visible=True, value=None, interactive=False),
         key_box: gr.update(visible=True, value=None, interactive=False),
@@ -536,7 +536,7 @@ CSS = """
 </button>
 
 """
-back_to_top_btn_html = '''
+back_to_top_btn_html = """
 
 <button onclick="scrollToTop()" style="color:white; text-decoration:none;">
   Back to Top!
@@ -555,7 +555,7 @@ function scrollToTop() {
 </script>
 
 
-'''
+"""
 
 if __name__ == "__main__":
 
@@ -565,7 +565,7 @@ if __name__ == "__main__":
 
     (X_train, X_test), (y_train, y_test), valid_symptoms, diseases = load_data()
 
-    with gr.Blocks(css="#box { height: 500px; overflow-y: scroll !important}") as demo:
+    with gr.Blocks(css="them") as demo:
 
         # Link + images
         gr.Markdown(
@@ -610,8 +610,9 @@ if __name__ == "__main__":
         with gr.Tabs(eelem_id="them") as tabs:
             with gr.TabItem("1. Chief Complaints", id=0):
                 gr.Markdown("<span style='color:grey'>Client Side</span>")
-                gr.Markdown("## Provide your chief complaints")
-                gr.Markdown("Provide at least 5 chief complaints by filling in the boxes below. ")
+                gr.Markdown(
+                    "## Provide at least 5 chief complaints by filling in the boxes below. "
+                )
 
                 # Box symptoms
                 check_boxes = []
@@ -633,7 +634,7 @@ if __name__ == "__main__":
 
                 # Default disease, picked from the dataframe
                 gr.Markdown(
-                    "You can choose an existing disease and explore its associated symptoms."
+                    "## You can choose an **existing disease** and explore its associated symptoms."
                 )
 
                 with gr.Row():
@@ -648,18 +649,24 @@ if __name__ == "__main__":
                     fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms]
                 )
 
-                # User symptom vector
-                user_vect_box1 = gr.Textbox(label="User Symptoms Vector:", interactive=False)
+                gr.Markdown(
+                    "#### Submit your chief complaints by clicking on **Confirm Symptoms 👆** then go to the **Next Step 👉**"
+                )
 
-                # Submit botton
-                submit_button = gr.Button("Submit 👆")
+                user_vect_box1 = gr.Textbox(
+                    visible=False,
+                )
+
+                with gr.Row():
+                    with gr.Column():
+                        # Submit botton
+                        submit_button = gr.Button("Confirm Symptoms 👆")
+                    with gr.Column():
+                        next_tab = gr.Button("Next Step 👉")
+                        next_tab.click(lambda _: gr.Tabs.update(selected=1), None, tabs)
 
                 # Clear botton
                 clear_button = gr.Button("Reset Space 🔁")
-                # Next tab
-                gr.Markdown("")
-                next_tab = gr.Button("Next Step 👉")
-                next_tab.click(lambda _: gr.Tabs.update(selected=1), None, tabs)
 
             with gr.TabItem("2. Data Encryption", id=1):
                 gr.Markdown("<span style='color:grey'>Client Side</span>")
@@ -672,15 +679,10 @@ if __name__ == "__main__":
 
                 gen_key_btn = gr.Button("Generate the evaluation key 👆")
                 error_box2 = gr.Textbox(label="Error ❌", visible=False)
-
                 user_id_box = gr.Textbox(label="User ID:", interactive=False, visible=True)
-                # Evaluation key size
-
                 key_len_box = gr.Textbox(
                     label="Evaluation Key Size:", interactive=False, visible=False
                 )
-
-                # Evaluation key (truncated)
                 key_box = gr.Textbox(
                     label="Evaluation key (truncated):",
                     max_lines=3,
@@ -688,41 +690,26 @@ if __name__ == "__main__":
                     visible=False,
                 )
 
-                gen_key_btn.click(
-                    key_gen_fn,
-                    inputs=user_vect_box1,
-                    outputs=[
-                        key_box,
-                        user_id_box,
-                        key_len_box,
-                        error_box2,
-                    ],
-                )
-
                 gr.Markdown("## Encrypt the data")
 
                 encrypt_btn = gr.Button("Encrypt the data using the 🔒 private secret key 👆")
                 error_box3 = gr.Textbox(label="Error ❌", visible=False)
+                quant_vect_box = gr.Textbox(
+                    label="Quantized Vector:",
+                    interactive=False,
+                    visible=False,
+                )
 
                 with gr.Row():
-                    with gr.Column(scale=1, min_width=600):
+                    with gr.Column():
                         user_vect_box2 = gr.Textbox(
-                            label="User Symptoms Vector:",
-                            interactive=False,
-                            visible=False,
+                            label="User Symptoms Vector:", interactive=False, max_lines=10
                         )
 
-                    with gr.Column(scale=1, min_width=600):
-                        quant_vect_box = gr.Textbox(
-                            label="Quantized Vector:",
-                            interactive=False,
-                            visible=False,
-                        )
-
-                    with gr.Column(scale=1, min_width=600):
+                    with gr.Column():
                         enc_vect_box = gr.Textbox(
                             label="Encrypted Vector:",
-                            max_lines=3,
+                            max_lines=10,
                             interactive=False,
                         )
 
@@ -731,7 +718,6 @@ if __name__ == "__main__":
                     inputs=[user_vect_box1, user_id_box],
                     outputs=[
                         user_vect_box2,
-                        quant_vect_box,
                         enc_vect_box,
                         error_box3,
                     ],
@@ -832,7 +818,7 @@ if __name__ == "__main__":
 
                 decrypt_target_btn.click(
                     decrypt_fn,
-                    inputs=[user_id_box, user_vect_box1],
+                    inputs=[user_id_box, user_vect_box1, *check_boxes],
                     outputs=[decrypt_target_box, error_box7],
                 )
 
@@ -845,17 +831,29 @@ if __name__ == "__main__":
                         next_tab = gr.Button("👈 👈 Go back to start")
                         next_tab.click(lambda _: gr.Tabs.update(selected=0), None, tabs)
 
+        gen_key_btn.click(
+            key_gen_fn,
+            inputs=user_vect_box1,
+            outputs=[
+                key_box,
+                user_id_box,
+                key_len_box,
+                error_box2,
+            ],
+        )
+
         submit_button.click(
             fn=get_features_fn,
             inputs=[*check_boxes],
-            outputs=[user_vect_box1, error_box1, recap_symptoms_box],
+            outputs=[user_vect_box1, error_box1, submit_button],
         )
 
         clear_button.click(
             reset_fn,
             outputs=[
-                user_vect_box1,
                 user_vect_box2,
+                user_vect_box1,
+                submit_button,
                 # disease_box,
                 error_box1,
                 error_box2,
