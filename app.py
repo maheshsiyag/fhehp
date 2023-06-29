@@ -533,9 +533,6 @@ if __name__ == "__main__":
         - The evaluation key is a public key that the server needs to process encrypted data.
         """
         )
-        gr.Markdown(
-            "Disclaimer: this demo is not to be used as a substitute for medical advice, diagnosis or treatment of any health condition. Any questions regarding your own health should be addressed to your physician or other healthcare provider."
-        )
 
         # ------------------------- Step 1 -------------------------
         gr.Markdown(
@@ -720,7 +717,12 @@ if __name__ == "__main__":
         )
         
         # ------------------------- End -------------------------
-
+        gr.Markdown(
+           """**Please Note**: This space is intended solely for educational and demonstration purposes. 
+           It should not be considered as a replacement for professional medical counsel, diagnosis, or therapy for any health or related issues. 
+           Any questions or concerns about your individual health should be addressed to your doctor or another qualified healthcare provider.
+        """)
+        
         gr.Markdown(
             """The app was built with [Concrete ML](https://github.com/zama-ai/concrete-ml), a Privacy-Preserving Machine Learning (PPML) open-source set of tools by Zama. 
             Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
