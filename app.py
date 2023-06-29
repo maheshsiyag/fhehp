@@ -124,7 +124,7 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
-        submit_button: gr.update(value="Data submitted ✅"),
+        submit_btn: gr.update(value="Data submitted ✅"),
     }
 
 
@@ -457,7 +457,7 @@ def decrypt_fn(
     return {
         error_box7: gr.update(visible=False),
         decrypt_target_box: out,
-        submit_button: gr.update(value="Submit")
+        submit_btn: gr.update(value="Submit")
     }
 
 
@@ -468,7 +468,7 @@ def reset_fn():
 
     return {
         user_vect_box2: None,
-        submit_button: gr.update(value="Submit"),
+        submit_btn: gr.update(value="Submit"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
         user_vect_box1: None,
         default_symptoms: gr.update(visible=True, value=None),
@@ -540,7 +540,7 @@ if __name__ == "__main__":
         gr.Markdown("<span style='color:grey'>Client Side</span>")
         gr.Markdown("Select at least 5 chief complaints from the list below.")
 
-        # Box symptoms
+        # Step 1.1: Provide symptoms
         check_boxes = []
         with gr.Row():
             with gr.Column():
@@ -571,23 +571,29 @@ if __name__ == "__main__":
                 default_symptoms = gr.Textbox(
                     label="Related Symptoms:", interactive=False, visible=False,
                 )
-
+        # User vector symptoms encoded in oneHot representation
+        user_vect_box1 = gr.Textbox(visible=False)
+        # Submit botton
+        submit_btn = gr.Button("Submit")
+        # Clear botton
+        clear_button = gr.Button("Reset Space 🔁", visible=False)    
+    
         disease_box.change(fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms])
 
-        user_vect_box1 = gr.Textbox(visible=False)
 
-        # Submit botton
-        submit_button = gr.Button("Submit")
-        # Clear botton
-        clear_button = gr.Button("Reset Space 🔁 ↻", visible=False)      
+        submit_btn.click(
+            fn=get_features_fn,
+            inputs=[*check_boxes],
+            outputs=[user_vect_box1, error_box1, submit_btn],
+        )
 
-        
         # ------------------------- Step 2 -------------------------
         gr.Markdown("## Step 2: Encrypt data")
         gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
-        gr.Markdown("### Key Generation")
+        # Step 2.1: Key generation
         gr.Markdown(
+            "### Key Generation\n\n"
             "In FHE schemes, a secret (enc/dec)ryption keys are generated for encrypting and decrypting data owned by the client. \n\n"
             "Additionally, a public evaluation key is generated, enabling external entities to perform homomorphic operations on encrypted data, without the need to decrypt them. \n\n"
             "The evaluation key will be transmitted to the server for further processing."
@@ -595,39 +601,32 @@ if __name__ == "__main__":
 
         gen_key_btn = gr.Button("Generate the evaluation key")
         error_box2 = gr.Textbox(label="Error ❌", visible=False)
-        user_id_box = gr.Textbox(label="User ID:", interactive=False, visible=True)
-        key_len_box = gr.Textbox(
-            label="Evaluation Key Size:", interactive=False, visible=False
-        )
-        key_box = gr.Textbox(
-            label="Evaluation key (truncated):",
-            max_lines=3,
-            interactive=False,
-            visible=False,
+        user_id_box = gr.Textbox(label="User ID:", visible=True)
+        key_len_box = gr.Textbox(label="Evaluation Key Size:",  visible=False)
+        key_box = gr.Textbox(label="Evaluation key (truncated):", max_lines=3, visible=False)
+        
+        gen_key_btn.click(
+            key_gen_fn,
+            inputs=user_vect_box1,
+            outputs=[
+                key_box,
+                user_id_box,
+                key_len_box,
+                error_box2,
+            ],
         )
 
+        # Step 2.2: Encrypt data locally
         gr.Markdown("### Encrypt the data")
-
         encrypt_btn = gr.Button("Encrypt the data using the private secret key")
         error_box3 = gr.Textbox(label="Error ❌", visible=False)
-        quant_vect_box = gr.Textbox(
-            label="Quantized Vector:",
-            interactive=False,
-            visible=False,
-        )
+        quant_vect_box = gr.Textbox(label="Quantized Vector:", visible=False)
 
         with gr.Row():
             with gr.Column():
-                user_vect_box2 = gr.Textbox(
-                    label="User Symptoms Vector:", interactive=False, max_lines=10
-                )
-
+                user_vect_box2 = gr.Textbox(label="User Symptoms Vector:", max_lines=10)
             with gr.Column():
-                enc_vect_box = gr.Textbox(
-                    label="Encrypted Vector:",
-                    max_lines=10,
-                    interactive=False,
-                )
+                enc_vect_box = gr.Textbox(label="Encrypted Vector:", max_lines=10)
 
         encrypt_btn.click(
             encrypt_fn,
@@ -638,21 +637,17 @@ if __name__ == "__main__":
                 error_box3,
             ],
         )
-
+        # Step 2.3: Send encrypted data to the server
         gr.Markdown(
-            "### Send the encrypted data to the "
-            "<span style='color:grey'>Server Side</span>"
+            "### Send the encrypted data to the <span style='color:grey'>Server Side</span>"
         )
-
         error_box4 = gr.Textbox(label="Error ❌", visible=False)
 
         with gr.Row().style(equal_height=False):
             with gr.Column(scale=4):
                 send_input_btn = gr.Button("Send data")
             with gr.Column(scale=1):
-                srv_resp_send_data_box = gr.Checkbox(
-                    label="Data Sent", show_label=False, interactive=False
-                )
+                srv_resp_send_data_box = gr.Checkbox(label="Data Sent", show_label=False)
 
         send_input_btn.click(
             send_input_fn,
@@ -713,7 +708,7 @@ if __name__ == "__main__":
         decrypt_target_btn.click(
             decrypt_fn,
             inputs=[user_id_box, user_vect_box1, *check_boxes],
-            outputs=[decrypt_target_box, error_box7, submit_button],
+            outputs=[decrypt_target_box, error_box7, submit_btn],
         )
         
         # ------------------------- End -------------------------
@@ -723,35 +718,20 @@ if __name__ == "__main__":
             Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
         """)
 
+        gr.Markdown("\n\n")
+
         gr.Markdown(
            """**Please Note**: This space is intended solely for educational and demonstration purposes. 
            It should not be considered as a replacement for professional medical counsel, diagnosis, or therapy for any health or related issues. 
            Any questions or concerns about your individual health should be addressed to your doctor or another qualified healthcare provider.
         """)
 
-        submit_button.click(
-            fn=get_features_fn,
-            inputs=[*check_boxes],
-            outputs=[user_vect_box1, error_box1, submit_button],
-        )
-
-        gen_key_btn.click(
-            key_gen_fn,
-            inputs=user_vect_box1,
-            outputs=[
-                key_box,
-                user_id_box,
-                key_len_box,
-                error_box2,
-            ],
-        )
-
         clear_button.click(
             reset_fn,
             outputs=[
                 user_vect_box2,
                 user_vect_box1,
-                submit_button,
+                submit_btn,
                 # disease_box,
                 error_box1,
                 error_box2,

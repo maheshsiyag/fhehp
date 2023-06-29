@@ -10,7 +10,7 @@ from concrete.ml.sklearn import XGBClassifier as ConcreteXGBoostClassifier
 
 # Max Input to be displayed on the HuggingFace space brower using Gradio
 # Too large inputs, slow down the server: https://github.com/gradio-app/gradio/issues/1877
-INPUT_BROWSER_LIMIT = 635
+INPUT_BROWSER_LIMIT = 400
 
 # Store the server's URL
 SERVER_URL = "http://localhost:8000/"
