@@ -547,17 +547,17 @@ if __name__ == "__main__":
             with gr.Column():
                 for category in SYMPTOMS_LIST[:3]:
                     with gr.Accordion(pretty_print(category.keys()), open=False):
-                        check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                        check_box = gr.CheckboxGroup(pretty_print(category.values()), show_label=0)
                         check_boxes.append(check_box)
             with gr.Column():
                 for category in SYMPTOMS_LIST[3:6]:
                     with gr.Accordion(pretty_print(category.keys()), open=False):
-                        check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                        check_box = gr.CheckboxGroup(pretty_print(category.values()), show_label=0)
                         check_boxes.append(check_box)
             with gr.Column():
                 for category in SYMPTOMS_LIST[6:]:
                     with gr.Accordion(pretty_print(category.keys()), open=False):
-                        check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                        check_box = gr.CheckboxGroup(pretty_print(category.values()), show_label=0)
                         check_boxes.append(check_box)
 
         error_box1 = gr.Textbox(label="Error ❌", visible=False)
