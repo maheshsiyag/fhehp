@@ -124,7 +124,7 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
-        submit_button: gr.update(value="Data Submitted ✅ ✔"),
+        submit_button: gr.update(value="Data Submitted ✅"),
     }
 
 
