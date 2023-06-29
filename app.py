@@ -65,29 +65,6 @@ def display_default_symptoms_fn(default_disease: str) -> Dict:
     }
 
 
-# <!> This function has been paused due to UI issues.
-
-# def fill_in_fn(default_disease: str, *checkbox_symptoms: Tuple[str]) -> Dict:
-#     """
-#     Fill in the gr.CheckBoxGroup list with predefined symptoms of a selected default disease.
-#     Args:
-#         default_disease (str): The default selected disease
-#         *checkbox_symptoms (Tuple[str]): Existing checked symptoms
-#     Returns:
-#         dict: The updated gr.CheckBoxesGroup.
-#     """
-#
-#     # Figure out the symptoms of the disease, selected by the user
-#     df = pd.read_csv(TRAINING_FILENAME)
-#     df_filtred = df[df[TARGET_COLUMNS[1]] == default_disease]
-#     symptoms = pretty_print(df_filtred.columns[df_filtred.eq(1).any()].to_list())
-#     # Check if there are existing symptoms, in the CheckbBxGroup list
-#     if any(lst for lst in checkbox_symptoms if lst):
-#         for sublist in checkbox_symptoms:
-#             symptoms.extend(sublist)
-#     return {box: symptoms for box in check_boxes}
-
-
 def get_user_symptoms_from_checkboxgroup(checkbox_symptoms: List) -> np.array:
     """
     Convert the user symptoms into a binary vector representation.
