@@ -124,7 +124,7 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
-        submit_button: gr.update(value="Data Submitted ✅"),
+        submit_button: gr.update(value="Data submitted ✅"),
     }
 
 
@@ -457,6 +457,7 @@ def decrypt_fn(
     return {
         error_box7: gr.update(visible=False),
         decrypt_target_box: out,
+        submit_button: gr.update(value="Submit symptoms")
     }
 
 
@@ -467,7 +468,7 @@ def reset_fn():
 
     return {
         user_vect_box2: None,
-        submit_button: gr.update(value="Submit Symptoms"),
+        submit_button: gr.update(value="Submit symptoms"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
         user_vect_box1: None,
         default_symptoms: gr.update(visible=True, value=None),
@@ -555,7 +556,7 @@ if __name__ == "__main__":
             "## Step 1: Select chief complaints"
         )
         gr.Markdown("<span style='color:grey'>Client Side</span>")
-        gr.Markdown("Select at least 5 symptoms from the list below.")
+        gr.Markdown("Select at least 5 chief complaints from the list below.")
 
         # Box symptoms
         check_boxes = []
@@ -594,7 +595,7 @@ if __name__ == "__main__":
         user_vect_box1 = gr.Textbox(visible=False)
 
         # Submit botton
-        submit_button = gr.Button("Submit Symptoms")
+        submit_button = gr.Button("Submit symptoms")
         # Clear botton
         clear_button = gr.Button("Reset Space 🔁 ↻", visible=False)      
 
@@ -663,7 +664,7 @@ if __name__ == "__main__":
 
         with gr.Row().style(equal_height=False):
             with gr.Column(scale=4):
-                send_input_btn = gr.Button("Send the encrypted data")
+                send_input_btn = gr.Button("Send data")
             with gr.Column(scale=1):
                 srv_resp_send_data_box = gr.Checkbox(
                     label="Data Sent", show_label=False, interactive=False
@@ -701,7 +702,7 @@ if __name__ == "__main__":
         gr.Markdown("## Step 4: Decrypt the data")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
 
-        gr.Markdown("### Get the data from the <span style='color:grey'>Server Side</span>")
+        gr.Markdown("### Get the encrypted data from the <span style='color:grey'>Server Side</span>")
 
         error_box6 = gr.Textbox(label="Error ❌", visible=False)
 
@@ -721,16 +722,15 @@ if __name__ == "__main__":
 
         gr.Markdown("### Decrypt the output")
 
-        decrypt_target_btn = gr.Button(
-            "Decrypt the output with the private secret decryption key"
-        )
+        decrypt_target_btn = gr.Button("Decrypt the output using the private secret key")
+
         error_box7 = gr.Textbox(label="Error ❌", visible=False)
         decrypt_target_box = gr.Textbox(label="Decrypted Output:", interactive=False)
 
         decrypt_target_btn.click(
             decrypt_fn,
             inputs=[user_id_box, user_vect_box1, *check_boxes],
-            outputs=[decrypt_target_box, error_box7],
+            outputs=[decrypt_target_box, error_box7, submit_button],
         )
         
         # ------------------------- End -------------------------
