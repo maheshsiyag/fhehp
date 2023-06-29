@@ -469,15 +469,15 @@ def reset_fn():
     return {
         one_hot_vector_box: None,
         submit_btn: gr.update(value="Submit"),
-        user_id_box: gr.update(visible=False, value=None, interactive=False),
+        user_id_box: gr.update(visible=False, value=None),
         one_hot_vector: None,
         default_symptoms: gr.update(visible=True, value=None),
         disease_box: gr.update(visible=True, value=None),
-        quant_vect_box: gr.update(visible=False, value=None, interactive=False),
-        enc_vect_box: gr.update(visible=True, value=None, interactive=False),
-        key_box: gr.update(visible=True, value=None, interactive=False),
-        key_len_box: gr.update(visible=False, value=None, interactive=False),
-        fhe_execution_time_box: gr.update(visible=True, value=None, interactive=False),
+        quant_vect_box: gr.update(visible=False, value=None),
+        enc_vect_box: gr.update(visible=True, value=None),
+        key_box: gr.update(visible=True, value=None),
+        key_len_box: gr.update(visible=False, value=None),
+        fhe_execution_time_box: gr.update(visible=True, value=None),
         decrypt_box: None,
         error_box7: gr.update(visible=False),
         error_box1: gr.update(visible=False),
@@ -535,6 +535,7 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 1 -------------------------
+        gr.Markdown("\n")
         gr.Markdown("## Step 1: Select chief complaints")
         gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
@@ -568,9 +569,7 @@ if __name__ == "__main__":
             with gr.Column(scale=2):
                 disease_box = gr.Dropdown(sorted(diseases), label="Diseases", visible=False)
             with gr.Column(scale=5):
-                default_symptoms = gr.Textbox(
-                    label="Related Symptoms:", interactive=False, visible=False,
-                )
+                default_symptoms = gr.Textbox(label="Related Symptoms:", visible=False)
         # User vector symptoms encoded in oneHot representation
         one_hot_vector = gr.Textbox(visible=False)
         # Submit botton
@@ -588,6 +587,7 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 2 -------------------------
+        gr.Markdown("\n")
         gr.Markdown("## Step 2: Encrypt data")
         gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
@@ -656,12 +656,13 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 3 -------------------------
+        gr.Markdown("\n")
         gr.Markdown("## Step 3: Run the FHE evaluation")
         gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Server Side</span>")
         gr.Markdown(
             "Once the server receives the encrypted data, it can process and compute the output without ever decrypting the data just as it would on clear data.\n\n"
-            "This server employs a [logistic regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
+            "This server employs a [Logistic Regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
         )
 
         run_fhe_btn = gr.Button("Run the FHE evaluation")
@@ -674,6 +675,7 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 4 -------------------------
+        gr.Markdown("\n")
         gr.Markdown("## Step 4: Decrypt the data")
         gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
@@ -686,9 +688,7 @@ if __name__ == "__main__":
             with gr.Column(scale=4):
                 get_output_btn = gr.Button("Get data")
             with gr.Column(scale=1):
-                srv_resp_retrieve_data_box = gr.Checkbox(
-                    label="Data Received", show_label=False, interactive=False
-                )
+                srv_resp_retrieve_data_box = gr.Checkbox(label="Data Received", show_label=False)
 
         get_output_btn.click(
             get_output_fn,
@@ -700,7 +700,7 @@ if __name__ == "__main__":
         gr.Markdown("### Decrypt the output")
         decrypt_btn = gr.Button("Decrypt the output using the private secret key")
         error_box7 = gr.Textbox(label="Error ❌", visible=False)
-        decrypt_box = gr.Textbox(label="Decrypted Output:", interactive=False)
+        decrypt_box = gr.Textbox(label="Decrypted Output:")
 
         decrypt_btn.click(
             decrypt_fn,
