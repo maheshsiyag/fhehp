@@ -124,7 +124,7 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
-        submit_button: gr.update(value="Symptoms submitted ✅"),
+        submit_button: gr.update(value="Data submitted ✅"),
     }
 
 
@@ -457,7 +457,7 @@ def decrypt_fn(
     return {
         error_box7: gr.update(visible=False),
         decrypt_target_box: out,
-        submit_button: gr.update(value="Submit symptoms")
+        submit_button: gr.update(value="Submit")
     }
 
 
@@ -468,7 +468,7 @@ def reset_fn():
 
     return {
         user_vect_box2: None,
-        submit_button: gr.update(value="Submit symptoms"),
+        submit_button: gr.update(value="Submit"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
         user_vect_box1: None,
         default_symptoms: gr.update(visible=True, value=None),
@@ -535,9 +535,8 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 1 -------------------------
-        gr.Markdown(
-            "## Step 1: Select chief complaints"
-        )
+        gr.Markdown("## Step 1: Select chief complaints")
+        gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
         gr.Markdown("Select at least 5 chief complaints from the list below.")
 
@@ -578,12 +577,14 @@ if __name__ == "__main__":
         user_vect_box1 = gr.Textbox(visible=False)
 
         # Submit botton
-        submit_button = gr.Button("Submit symptoms")
+        submit_button = gr.Button("Submit")
         # Clear botton
         clear_button = gr.Button("Reset Space 🔁 ↻", visible=False)      
 
+        
         # ------------------------- Step 2 -------------------------
         gr.Markdown("## Step 2: Encrypt data")
+        gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
         gr.Markdown("### Key Generation")
         gr.Markdown(
@@ -660,8 +661,8 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 3 -------------------------
-
         gr.Markdown("## Step 3: Run the FHE evaluation")
+        gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Server Side</span>")
         gr.Markdown(
             "Once the server receives the encrypted data, it can process and compute the output without ever decrypting the data just as it would on clear data.\n\n"
@@ -681,10 +682,9 @@ if __name__ == "__main__":
         )
 
         # ------------------------- Step 4 -------------------------
-
         gr.Markdown("## Step 4: Decrypt the data")
+        gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
-
         gr.Markdown("### Get the encrypted data from the <span style='color:grey'>Server Side</span>")
 
         error_box6 = gr.Textbox(label="Error ❌", visible=False)
@@ -717,17 +717,17 @@ if __name__ == "__main__":
         )
         
         # ------------------------- End -------------------------
-        gr.Markdown(
-           """**Please Note**: This space is intended solely for educational and demonstration purposes. 
-           It should not be considered as a replacement for professional medical counsel, diagnosis, or therapy for any health or related issues. 
-           Any questions or concerns about your individual health should be addressed to your doctor or another qualified healthcare provider.
-        """)
         
         gr.Markdown(
             """The app was built with [Concrete ML](https://github.com/zama-ai/concrete-ml), a Privacy-Preserving Machine Learning (PPML) open-source set of tools by Zama. 
             Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
         """)
 
+        gr.Markdown(
+           """**Please Note**: This space is intended solely for educational and demonstration purposes. 
+           It should not be considered as a replacement for professional medical counsel, diagnosis, or therapy for any health or related issues. 
+           Any questions or concerns about your individual health should be addressed to your doctor or another qualified healthcare provider.
+        """)
 
         submit_button.click(
             fn=get_features_fn,
