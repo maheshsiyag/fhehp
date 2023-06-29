@@ -506,34 +506,6 @@ CSS = """
 """
 
 
-"""
-
-<button id="toTopBtn" onclick="'parentIFrame' in window ? window.parentIFrame.scrollTo({top: 0, behavior:'smooth'}) : window.scrollTo({ top: 0 })">
-<a style="color:white; text-decoration:none;">Back to Top!</a>
-</button>
-
-"""
-back_to_top_btn_html = """
-
-<button onclick="scrollToTop()" style="color:white; text-decoration:none;">
-  Back to Top!
-</button>
-
-<script>
-function scrollToTop() {
-  // Check if the parentIFrame exists and use it for scrolling if available
-  if ('parentIFrame' in window) {
-    window.parentIFrame.scrollTo({top: 0, behavior: 'smooth'});
-  } else {
-    // Use the standard scrollIntoView method for scrolling
-    document.documentElement.scrollIntoView({behavior: 'smooth'});
-  }
-}
-</script>
-
-
-"""
-
 if __name__ == "__main__":
 
     print("Starting demo ...")
