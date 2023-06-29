@@ -593,13 +593,7 @@ if __name__ == "__main__":
                             label="Related Symptoms:", visible=True, interactive=False
                         )
 
-                disease_box.change(
-                    fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms]
-                )
-
-                gr.Markdown(
-                    "#### Submit your chief complaints by clicking on **Confirm Symptoms 👆** then go to the **Next Step 👉**"
-                )
+                disease_box.change(fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms])
 
                 user_vect_box1 = gr.Textbox(visible=False)
 
@@ -688,16 +682,6 @@ if __name__ == "__main__":
                     outputs=[error_box4, srv_resp_send_data_box],
                 )
 
-                gr.Markdown("\n\n")
-                with gr.Row().style(equal_height=True):
-                    with gr.Column(scale=1):
-                        prev_tab = gr.Button("👈 Previous Step")
-                        prev_tab.click(lambda _: gr.Tabs.update(selected=0), None, tabs)
-
-                    with gr.Column(scale=1):
-                        next_tab = gr.Button("Next Step 👉")
-                        next_tab.click(lambda _: gr.Tabs.update(selected=2), None, tabs)
-
             with gr.TabItem("3. FHE execution", id=2):
                 gr.Markdown("<span style='color:grey'>Server Side</span>")
                 gr.Markdown("## Run the FHE evaluation")
@@ -717,16 +701,6 @@ if __name__ == "__main__":
                     inputs=[user_id_box],
                     outputs=[fhe_execution_time_box, error_box5],
                 )
-
-                gr.Markdown("\n\n")
-                with gr.Row().style(equal_height=True):
-                    with gr.Column(scale=1):
-                        prev_tab = gr.Button("👈 Previous Step")
-                        prev_tab.click(lambda _: gr.Tabs.update(selected=1), None, tabs)
-
-                    with gr.Column(scale=1):
-                        next_tab = gr.Button("Next Step 👉 ")
-                        next_tab.click(lambda _: gr.Tabs.update(selected=3), None, tabs)
 
             with gr.TabItem("4. Data Decryption", id=3):
                 gr.Markdown("<span style='color:grey'>Client Side</span>")
@@ -765,15 +739,6 @@ if __name__ == "__main__":
                     inputs=[user_id_box, user_vect_box1, *check_boxes],
                     outputs=[decrypt_target_box, error_box7],
                 )
-
-                with gr.Row().style(equal_height=True):
-                    with gr.Column(scale=1):
-                        prev_tab = gr.Button("👈 Previous Step")
-                        prev_tab.click(lambda _: gr.Tabs.update(selected=2), None, tabs)
-
-                    with gr.Column(scale=1):
-                        next_tab = gr.Button("👈 👈 Go back to start")
-                        next_tab.click(lambda _: gr.Tabs.update(selected=0), None, tabs)
 
         gen_key_btn.click(
             key_gen_fn,
