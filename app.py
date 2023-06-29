@@ -536,7 +536,7 @@ if __name__ == "__main__":
             </p>
 
             <p align="center">
-            <img width="100%" height="30%" src="https://raw.githubusercontent.com/kcelia/Img/main/cover_image.png">
+            <img width="90%" height="30%" src="https://raw.githubusercontent.com/kcelia/Img/main/hf_space_3_health_prediction_cover_image.png">
             </p>
             """
         )
