@@ -470,7 +470,6 @@ def reset_fn():
         submit_button: gr.update(value="Confirm Symptoms"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
         user_vect_box1: None,
-        recap_symptoms_box: gr.update(visible=False, value=None),
         default_symptoms: gr.update(visible=True, value=None),
         disease_box: gr.update(visible=True, value=None),
         quant_vect_box: gr.update(visible=False, value=None, interactive=False),
@@ -581,9 +580,7 @@ if __name__ == "__main__":
                 error_box1 = gr.Textbox(label="Error ❌", visible=False)
 
                 # Default disease, picked from the dataframe
-                gr.Markdown(
-                    "You can choose an **existing disease** and explore its associated symptoms."
-                )
+                gr.Markdown("You can choose an **existing disease** and explore its associated symptoms.")
 
                 with gr.Row():
                     with gr.Column(scale=2):
@@ -683,11 +680,11 @@ if __name__ == "__main__":
                 )
 
             with gr.TabItem("3. FHE execution", id=2):
+                gr.Markdown("## Step 3: Run the FHE evaluation")
                 gr.Markdown("<span style='color:grey'>Server Side</span>")
-                gr.Markdown("## Run the FHE evaluation")
                 gr.Markdown(
                     "Once the server receives the encrypted data, it can process and compute the output without ever decrypting the data just as it would on clear data.\n\n"
-                    "This server employs a logistic regression model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
+                    "This server employs a [logistic regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
                 )
 
                 run_fhe_btn = gr.Button("Run the FHE evaluation 👆")
@@ -703,8 +700,10 @@ if __name__ == "__main__":
                 )
 
             with gr.TabItem("4. Data Decryption", id=3):
+                gr.Markdown("## Step 4: Decrypt the data")
                 gr.Markdown("<span style='color:grey'>Client Side</span>")
-                gr.Markdown("## Get the data from the <span style='color:grey'>Server Side</span>")
+
+                gr.Markdown("### Get the data from the <span style='color:grey'>Server Side</span>")
 
                 error_box6 = gr.Textbox(label="Error ❌", visible=False)
 
@@ -722,11 +721,7 @@ if __name__ == "__main__":
                     outputs=[srv_resp_retrieve_data_box, error_box6],
                 )
 
-                gr.Markdown("## Decrypt the output")
-
-                recap_symptoms_box = gr.Textbox(
-                    label="Summary of chief complaints:", visible=False, max_lines=3
-                )
+                gr.Markdown("### Decrypt the output")
 
                 decrypt_target_btn = gr.Button(
                     "Decrypt the output with the 🔒 private secret decryption key 👆"
@@ -739,6 +734,11 @@ if __name__ == "__main__":
                     inputs=[user_id_box, user_vect_box1, *check_boxes],
                     outputs=[decrypt_target_box, error_box7],
                 )
+        
+        gr.Markdown(
+            """The app was built with [Concrete ML](https://github.com/zama-ai/concrete-ml), a Privacy-Preserving Machine Learning (PPML) open-source set of tools by Zama. 
+            Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
+        """)
 
         gen_key_btn.click(
             key_gen_fn,
@@ -773,7 +773,6 @@ if __name__ == "__main__":
                 error_box7,
                 disease_box,
                 default_symptoms,
-                recap_symptoms_box,
                 user_id_box,
                 key_len_box,
                 key_box,
