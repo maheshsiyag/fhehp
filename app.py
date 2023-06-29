@@ -124,7 +124,7 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
-        submit_button: gr.update(value="Data Submitted ✅"),
+        submit_button: gr.update(value="Data Submitted ✅ ✔"),
     }
 
 
@@ -202,7 +202,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
     client.load()
 
     user_symptoms = np.fromstring(user_symptoms[2:-2], dtype=int, sep=".").reshape(1, -1)
-    quant_user_symptoms = client.model.quantize_input(user_symptoms)
+    #quant_user_symptoms = client.model.quantize_input(user_symptoms)
 
     encrypted_quantized_user_symptoms = client.quantize_encrypt_serialize(user_symptoms)
     assert isinstance(encrypted_quantized_user_symptoms, bytes)
@@ -535,7 +535,7 @@ if __name__ == "__main__":
             </p>
 
             <p align="center">
-            <img width="90%" height="30%" src="https://raw.githubusercontent.com/kcelia/Img/main/hf_space_3_health_prediction_cover_image.png">
+            <img width="65%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/hf_space_3_health_prediction_cover_image.png">
             </p>
             """
         )
@@ -583,7 +583,7 @@ if __name__ == "__main__":
 
         with gr.Row():
             with gr.Column(scale=2):
-                disease_box = gr.Dropdown(sorted(diseases), label="Diseases 👆")
+                disease_box = gr.Dropdown(sorted(diseases), label="Diseases")
             with gr.Column(scale=5):
                 default_symptoms = gr.Textbox(
                     label="Related Symptoms:", visible=True, interactive=False
@@ -596,10 +596,10 @@ if __name__ == "__main__":
         with gr.Row():
             with gr.Column():
                 # Submit botton
-                submit_button = gr.Button("Submit Symptoms 👆")
+                submit_button = gr.Button("Submit Symptoms")
             with gr.Column():
                 # Clear botton
-                clear_button = gr.Button("Reset Space 🔁")      
+                clear_button = gr.Button("Reset Space 🔁 ↻")      
 
         # ------------------------- Step 2 -------------------------
         gr.Markdown("## Step 2: Encrypt data")
@@ -611,7 +611,7 @@ if __name__ == "__main__":
             "The evaluation key will be transmitted to the server for further processing."
         )
 
-        gen_key_btn = gr.Button("Generate the evaluation key 👆")
+        gen_key_btn = gr.Button("Generate the evaluation key")
         error_box2 = gr.Textbox(label="Error ❌", visible=False)
         user_id_box = gr.Textbox(label="User ID:", interactive=False, visible=True)
         key_len_box = gr.Textbox(
@@ -626,7 +626,7 @@ if __name__ == "__main__":
 
         gr.Markdown("### Encrypt the data")
 
-        encrypt_btn = gr.Button("Encrypt the data using the 🔒 private secret key 👆")
+        encrypt_btn = gr.Button("Encrypt the data using the private secret key")
         error_box3 = gr.Textbox(label="Error ❌", visible=False)
         quant_vect_box = gr.Textbox(
             label="Quantized Vector:",
@@ -666,7 +666,7 @@ if __name__ == "__main__":
 
         with gr.Row().style(equal_height=False):
             with gr.Column(scale=4):
-                send_input_btn = gr.Button("Send the encrypted data 👆")
+                send_input_btn = gr.Button("Send the encrypted data")
             with gr.Column(scale=1):
                 srv_resp_send_data_box = gr.Checkbox(
                     label="Data Sent", show_label=False, interactive=False
@@ -687,7 +687,7 @@ if __name__ == "__main__":
             "This server employs a [logistic regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
         )
 
-        run_fhe_btn = gr.Button("Run the FHE evaluation 👆")
+        run_fhe_btn = gr.Button("Run the FHE evaluation")
         error_box5 = gr.Textbox(label="Error ❌", visible=False)
         fhe_execution_time_box = gr.Textbox(
             label="Total FHE Execution Time:", interactive=False, visible=True
@@ -710,7 +710,7 @@ if __name__ == "__main__":
 
         with gr.Row().style(equal_height=True):
             with gr.Column(scale=4):
-                get_output_btn = gr.Button("Get data 👆")
+                get_output_btn = gr.Button("Get data")
             with gr.Column(scale=1):
                 srv_resp_retrieve_data_box = gr.Checkbox(
                     label="Data Received", show_label=False, interactive=False
@@ -725,7 +725,7 @@ if __name__ == "__main__":
         gr.Markdown("### Decrypt the output")
 
         decrypt_target_btn = gr.Button(
-            "Decrypt the output with the 🔒 private secret decryption key 👆"
+            "Decrypt the output with the private secret decryption key"
         )
         error_box7 = gr.Textbox(label="Error ❌", visible=False)
         decrypt_target_box = gr.Textbox(label="Decrypted Output:", interactive=False)
