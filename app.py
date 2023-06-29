@@ -115,12 +115,12 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
         print("Provide at least 5 symptoms.")
         return {
             error_box1: gr.update(visible=True, value="⚠️ Provide at least 5 symptoms"),
-            user_vect_box1: None,
+            one_hot_vector: None,
         }
 
     return {
         error_box1: gr.update(visible=False),
-        user_vect_box1: gr.update(
+        one_hot_vector: gr.update(
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
@@ -217,7 +217,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
 
     return {
         error_box3: gr.update(visible=False),
-        user_vect_box2: gr.update(visible=True, value=user_symptoms),
+        one_hot_vector_box: gr.update(visible=True, value=user_symptoms),
         enc_vect_box: gr.update(visible=True, value=encrypted_quantized_user_symptoms_shorten_hex),
     }
 
@@ -418,7 +418,7 @@ def decrypt_fn(
                 "- the server processed the encrypted data \n"
                 "- the Client received the data from the Server before decrypting the prediction",
             ),
-            decrypt_target_box: None,
+            decrypt_box: None,
         }
 
     # Load the encrypted output as bytes
@@ -456,7 +456,7 @@ def decrypt_fn(
 
     return {
         error_box7: gr.update(visible=False),
-        decrypt_target_box: out,
+        decrypt_box: out,
         submit_btn: gr.update(value="Submit")
     }
 
@@ -467,10 +467,10 @@ def reset_fn():
     clean_directory()
 
     return {
-        user_vect_box2: None,
+        one_hot_vector_box: None,
         submit_btn: gr.update(value="Submit"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
-        user_vect_box1: None,
+        one_hot_vector: None,
         default_symptoms: gr.update(visible=True, value=None),
         disease_box: gr.update(visible=True, value=None),
         quant_vect_box: gr.update(visible=False, value=None, interactive=False),
@@ -478,7 +478,7 @@ def reset_fn():
         key_box: gr.update(visible=True, value=None, interactive=False),
         key_len_box: gr.update(visible=False, value=None, interactive=False),
         fhe_execution_time_box: gr.update(visible=True, value=None, interactive=False),
-        decrypt_target_box: None,
+        decrypt_box: None,
         error_box7: gr.update(visible=False),
         error_box1: gr.update(visible=False),
         error_box2: gr.update(visible=False),
@@ -572,7 +572,7 @@ if __name__ == "__main__":
                     label="Related Symptoms:", interactive=False, visible=False,
                 )
         # User vector symptoms encoded in oneHot representation
-        user_vect_box1 = gr.Textbox(visible=False)
+        one_hot_vector = gr.Textbox(visible=False)
         # Submit botton
         submit_btn = gr.Button("Submit")
         # Clear botton
@@ -584,7 +584,7 @@ if __name__ == "__main__":
         submit_btn.click(
             fn=get_features_fn,
             inputs=[*check_boxes],
-            outputs=[user_vect_box1, error_box1, submit_btn],
+            outputs=[one_hot_vector, error_box1, submit_btn],
         )
 
         # ------------------------- Step 2 -------------------------
@@ -607,7 +607,7 @@ if __name__ == "__main__":
         
         gen_key_btn.click(
             key_gen_fn,
-            inputs=user_vect_box1,
+            inputs=one_hot_vector,
             outputs=[
                 key_box,
                 user_id_box,
@@ -624,15 +624,15 @@ if __name__ == "__main__":
 
         with gr.Row():
             with gr.Column():
-                user_vect_box2 = gr.Textbox(label="User Symptoms Vector:", max_lines=10)
+                one_hot_vector_box = gr.Textbox(label="User Symptoms Vector:", max_lines=10)
             with gr.Column():
                 enc_vect_box = gr.Textbox(label="Encrypted Vector:", max_lines=10)
 
         encrypt_btn.click(
             encrypt_fn,
-            inputs=[user_vect_box1, user_id_box],
+            inputs=[one_hot_vector, user_id_box],
             outputs=[
-                user_vect_box2,
+                one_hot_vector_box,
                 enc_vect_box,
                 error_box3,
             ],
@@ -651,7 +651,7 @@ if __name__ == "__main__":
 
         send_input_btn.click(
             send_input_fn,
-            inputs=[user_id_box, user_vect_box1],
+            inputs=[user_id_box, one_hot_vector],
             outputs=[error_box4, srv_resp_send_data_box],
         )
 
@@ -666,10 +666,7 @@ if __name__ == "__main__":
 
         run_fhe_btn = gr.Button("Run the FHE evaluation")
         error_box5 = gr.Textbox(label="Error ❌", visible=False)
-        fhe_execution_time_box = gr.Textbox(
-            label="Total FHE Execution Time:", interactive=False, visible=True
-        )
-
+        fhe_execution_time_box = gr.Textbox(label="Total FHE Execution Time:", visible=True)
         run_fhe_btn.click(
             run_fhe_fn,
             inputs=[user_id_box],
@@ -684,6 +681,7 @@ if __name__ == "__main__":
 
         error_box6 = gr.Textbox(label="Error ❌", visible=False)
 
+        # Step 4.1: Data transmission
         with gr.Row().style(equal_height=True):
             with gr.Column(scale=4):
                 get_output_btn = gr.Button("Get data")
@@ -694,21 +692,20 @@ if __name__ == "__main__":
 
         get_output_btn.click(
             get_output_fn,
-            inputs=[user_id_box, user_vect_box1],
+            inputs=[user_id_box, one_hot_vector],
             outputs=[srv_resp_retrieve_data_box, error_box6],
         )
 
+        # Step 4.1: Data transmission
         gr.Markdown("### Decrypt the output")
-
-        decrypt_target_btn = gr.Button("Decrypt the output using the private secret key")
-
+        decrypt_btn = gr.Button("Decrypt the output using the private secret key")
         error_box7 = gr.Textbox(label="Error ❌", visible=False)
-        decrypt_target_box = gr.Textbox(label="Decrypted Output:", interactive=False)
+        decrypt_box = gr.Textbox(label="Decrypted Output:", interactive=False)
 
-        decrypt_target_btn.click(
+        decrypt_btn.click(
             decrypt_fn,
-            inputs=[user_id_box, user_vect_box1, *check_boxes],
-            outputs=[decrypt_target_box, error_box7, submit_btn],
+            inputs=[user_id_box, one_hot_vector, *check_boxes],
+            outputs=[decrypt_box, error_box7, submit_btn],
         )
         
         # ------------------------- End -------------------------
@@ -729,8 +726,8 @@ if __name__ == "__main__":
         clear_button.click(
             reset_fn,
             outputs=[
-                user_vect_box2,
-                user_vect_box1,
+                one_hot_vector_box,
+                one_hot_vector,
                 submit_btn,
                 # disease_box,
                 error_box1,
@@ -750,7 +747,7 @@ if __name__ == "__main__":
                 srv_resp_send_data_box,
                 srv_resp_retrieve_data_box,
                 fhe_execution_time_box,
-                decrypt_target_box,
+                decrypt_box,
                 *check_boxes,
             ],
         )
