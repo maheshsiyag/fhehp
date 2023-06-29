@@ -540,7 +540,6 @@ if __name__ == "__main__":
             </p>
             """
         )
-
         gr.Markdown("## Notes")
         gr.Markdown(
         """
@@ -548,39 +547,42 @@ if __name__ == "__main__":
         - The evaluation key is a public key that the server needs to process encrypted data.
         """
         )
-
         gr.Markdown(
             "Disclaimer: this demo is not to be used as a substitute for medical advice, diagnosis or treatment of any health condition. Any questions regarding your own health should be addressed to your physician or other healthcare provider."
         )
 
         with gr.Tabs(eelem_id="them") as tabs:
             with gr.TabItem("1. Chief Complaints", id=0):
-                gr.Markdown("<span style='color:grey'>Client Side</span>")
                 gr.Markdown(
-                    "## Provide at least 5 chief complaints by filling in the boxes below. "
+                    "## Step 1: Select chief complaints"
                 )
+                gr.Markdown("<span style='color:grey'>Client Side</span>")
+                gr.Markdown("Select at least 5 symptoms from the list below.")
 
                 # Box symptoms
                 check_boxes = []
-                for i, category in enumerate(SYMPTOMS_LIST):
-                    with gr.Accordion(
-                        pretty_print(category.keys()),
-                        open=False,
-                        elem_classes="feedback",
-                    ) as accordion:
-                        check_box = gr.CheckboxGroup(
-                            pretty_print(category.values()),
-                            show_label=False,
-                        )
-                        check_boxes.append(check_box)
+                with gr.Row():
+                    with gr.Column():
+                        for category in SYMPTOMS_LIST[:3]:
+                            with gr.Accordion(pretty_print(category.keys()), open=False):
+                                check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                                check_boxes.append(check_box)
+                    with gr.Column():
+                        for category in SYMPTOMS_LIST[3:6]:
+                            with gr.Accordion(pretty_print(category.keys()), open=False):
+                                check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                                check_boxes.append(check_box)
+                    with gr.Column():
+                        for category in SYMPTOMS_LIST[6:]:
+                            with gr.Accordion(pretty_print(category.keys()), open=False):
+                                check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                                check_boxes.append(check_box)
 
                 error_box1 = gr.Textbox(label="Error ❌", visible=False)
 
-                # <!> This part has been paused due to UI issues.
-
                 # Default disease, picked from the dataframe
                 gr.Markdown(
-                    "## You can choose an **existing disease** and explore its associated symptoms."
+                    "You can choose an **existing disease** and explore its associated symptoms."
                 )
 
                 with gr.Row():
@@ -599,24 +601,20 @@ if __name__ == "__main__":
                     "#### Submit your chief complaints by clicking on **Confirm Symptoms 👆** then go to the **Next Step 👉**"
                 )
 
-                user_vect_box1 = gr.Textbox(
-                    visible=False,
-                )
+                user_vect_box1 = gr.Textbox(visible=False)
 
                 with gr.Row():
                     with gr.Column():
                         # Submit botton
-                        submit_button = gr.Button("Confirm Symptoms 👆")
+                        submit_button = gr.Button("Submit Symptoms 👆")
                     with gr.Column():
-                        next_tab = gr.Button("Next Step 👉")
-                        next_tab.click(lambda _: gr.Tabs.update(selected=1), None, tabs)
-
-                # Clear botton
-                clear_button = gr.Button("Reset Space 🔁")
+                        # Clear botton
+                        clear_button = gr.Button("Reset Space 🔁")      
 
             with gr.TabItem("2. Data Encryption", id=1):
+                gr.Markdown("## Step 2: Encrypt data")
                 gr.Markdown("<span style='color:grey'>Client Side</span>")
-                gr.Markdown("## Key Generation")
+                gr.Markdown("### Key Generation")
                 gr.Markdown(
                     "In FHE schemes, a secret (enc/dec)ryption keys are generated for encrypting and decrypting data owned by the client. \n\n"
                     "Additionally, a public evaluation key is generated, enabling external entities to perform homomorphic operations on encrypted data, without the need to decrypt them. \n\n"
