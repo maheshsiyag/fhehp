@@ -541,19 +541,16 @@ if __name__ == "__main__":
             """
         )
 
-        gr.Markdown("# Introduction")
+        gr.Markdown("## Notes")
         gr.Markdown(
-            "Welcome to our Healthcare Prediction space using Fully Homomorphic Encryption (FHE) with Concrete ML library."
+        """
+        - The private key is used to encrypt and decrypt the data and shall never be shared.
+        - The evaluation key is a public key that the server needs to process encrypted data.
+        """
         )
+
         gr.Markdown(
-            "Through this user-friendly and secure client-server interface you can confidently submit your chief complaints, which you have locally "
-            "encrypted on your end and transmitted to an untrusted server for processing.\n\n"
-            "Thanks to the FHE scheme, the remote server is able to perform computations without ever decrypting the data and return result the encrypted to the client for local decryption. \n\n\n"
-            "FHE ensures end-to-end data encryption and guarantees patient privacy."
-        )
-        gr.Markdown(
-            "Disclaimer: We are not medical professionals. For accurate diagnosis and treatment,  "
-            "please consult a qualified healthcare provider."
+            "Disclaimer: this demo is not to be used as a substitute for medical advice, diagnosis or treatment of any health condition. Any questions regarding your own health should be addressed to your physician or other healthcare provider."
         )
 
         with gr.Tabs(eelem_id="them") as tabs:
