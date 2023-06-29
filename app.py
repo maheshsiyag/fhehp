@@ -492,20 +492,6 @@ def reset_fn():
     }
 
 
-CSS = """
-#them {color: grey}
-#them {font-size: 24px} 
-#them {font-weight: bold}
-.gradio-container {background-color: white}
-.gradio-button {color: red; font-size: 20px;} 
-/* .feedback {font-size: 3px !important} */
-#svelte-s1r2yt {color: grey}
-#svelte-s1r2yt {font-size: 25px}
-#svelte-s1r2yt {font-weight: bold}
-/* #them {text-align: center} */
-"""
-
-
 if __name__ == "__main__":
 
     print("Starting demo ...")
@@ -514,7 +500,7 @@ if __name__ == "__main__":
 
     (X_train, X_test), (y_train, y_test), valid_symptoms, diseases = load_data()
 
-    with gr.Blocks(css="them") as demo:
+    with gr.Blocks() as demo:
 
         # Link + images
         gr.Markdown(
