@@ -467,7 +467,7 @@ def reset_fn():
 
     return {
         user_vect_box2: None,
-        submit_button: gr.update(value="Confirm Symptoms"),
+        submit_button: gr.update(value="Submit Symptoms"),
         user_id_box: gr.update(visible=False, value=None, interactive=False),
         user_vect_box1: None,
         default_symptoms: gr.update(visible=True, value=None),
@@ -579,27 +579,24 @@ if __name__ == "__main__":
         error_box1 = gr.Textbox(label="Error ❌", visible=False)
 
         # Default disease, picked from the dataframe
-        gr.Markdown("You can choose an **existing disease** and explore its associated symptoms.")
+        gr.Markdown("You can choose an **existing disease** and explore its associated symptoms.", visible=False)
 
         with gr.Row():
             with gr.Column(scale=2):
-                disease_box = gr.Dropdown(sorted(diseases), label="Diseases")
+                disease_box = gr.Dropdown(sorted(diseases), label="Diseases", visible=False)
             with gr.Column(scale=5):
                 default_symptoms = gr.Textbox(
-                    label="Related Symptoms:", visible=True, interactive=False
+                    label="Related Symptoms:", interactive=False, visible=False,
                 )
 
         disease_box.change(fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms])
 
         user_vect_box1 = gr.Textbox(visible=False)
 
-        with gr.Row():
-            with gr.Column():
-                # Submit botton
-                submit_button = gr.Button("Submit Symptoms")
-            with gr.Column():
-                # Clear botton
-                clear_button = gr.Button("Reset Space 🔁 ↻")      
+        # Submit botton
+        submit_button = gr.Button("Submit Symptoms")
+        # Clear botton
+        clear_button = gr.Button("Reset Space 🔁 ↻", visible=False)      
 
         # ------------------------- Step 2 -------------------------
         gr.Markdown("## Step 2: Encrypt data")
