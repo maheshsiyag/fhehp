@@ -550,195 +550,205 @@ if __name__ == "__main__":
             "Disclaimer: this demo is not to be used as a substitute for medical advice, diagnosis or treatment of any health condition. Any questions regarding your own health should be addressed to your physician or other healthcare provider."
         )
 
-        with gr.Tabs(eelem_id="them") as tabs:
-            with gr.TabItem("1. Chief Complaints", id=0):
-                gr.Markdown(
-                    "## Step 1: Select chief complaints"
-                )
-                gr.Markdown("<span style='color:grey'>Client Side</span>")
-                gr.Markdown("Select at least 5 symptoms from the list below.")
+        # ------------------------- Step 1 -------------------------
+        gr.Markdown(
+            "## Step 1: Select chief complaints"
+        )
+        gr.Markdown("<span style='color:grey'>Client Side</span>")
+        gr.Markdown("Select at least 5 symptoms from the list below.")
 
-                # Box symptoms
-                check_boxes = []
-                with gr.Row():
-                    with gr.Column():
-                        for category in SYMPTOMS_LIST[:3]:
-                            with gr.Accordion(pretty_print(category.keys()), open=False):
-                                check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
-                                check_boxes.append(check_box)
-                    with gr.Column():
-                        for category in SYMPTOMS_LIST[3:6]:
-                            with gr.Accordion(pretty_print(category.keys()), open=False):
-                                check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
-                                check_boxes.append(check_box)
-                    with gr.Column():
-                        for category in SYMPTOMS_LIST[6:]:
-                            with gr.Accordion(pretty_print(category.keys()), open=False):
-                                check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
-                                check_boxes.append(check_box)
+        # Box symptoms
+        check_boxes = []
+        with gr.Row():
+            with gr.Column():
+                for category in SYMPTOMS_LIST[:3]:
+                    with gr.Accordion(pretty_print(category.keys()), open=False):
+                        check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                        check_boxes.append(check_box)
+            with gr.Column():
+                for category in SYMPTOMS_LIST[3:6]:
+                    with gr.Accordion(pretty_print(category.keys()), open=False):
+                        check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                        check_boxes.append(check_box)
+            with gr.Column():
+                for category in SYMPTOMS_LIST[6:]:
+                    with gr.Accordion(pretty_print(category.keys()), open=False):
+                        check_box = gr.CheckboxGroup( pretty_print(category.values()), show_label=False)
+                        check_boxes.append(check_box)
 
-                error_box1 = gr.Textbox(label="Error ❌", visible=False)
+        error_box1 = gr.Textbox(label="Error ❌", visible=False)
 
-                # Default disease, picked from the dataframe
-                gr.Markdown("You can choose an **existing disease** and explore its associated symptoms.")
+        # Default disease, picked from the dataframe
+        gr.Markdown("You can choose an **existing disease** and explore its associated symptoms.")
 
-                with gr.Row():
-                    with gr.Column(scale=2):
-                        disease_box = gr.Dropdown(sorted(diseases), label="Diseases 👆")
-                    with gr.Column(scale=5):
-                        default_symptoms = gr.Textbox(
-                            label="Related Symptoms:", visible=True, interactive=False
-                        )
-
-                disease_box.change(fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms])
-
-                user_vect_box1 = gr.Textbox(visible=False)
-
-                with gr.Row():
-                    with gr.Column():
-                        # Submit botton
-                        submit_button = gr.Button("Submit Symptoms 👆")
-                    with gr.Column():
-                        # Clear botton
-                        clear_button = gr.Button("Reset Space 🔁")      
-
-            with gr.TabItem("2. Data Encryption", id=1):
-                gr.Markdown("## Step 2: Encrypt data")
-                gr.Markdown("<span style='color:grey'>Client Side</span>")
-                gr.Markdown("### Key Generation")
-                gr.Markdown(
-                    "In FHE schemes, a secret (enc/dec)ryption keys are generated for encrypting and decrypting data owned by the client. \n\n"
-                    "Additionally, a public evaluation key is generated, enabling external entities to perform homomorphic operations on encrypted data, without the need to decrypt them. \n\n"
-                    "The evaluation key will be transmitted to the server for further processing."
+        with gr.Row():
+            with gr.Column(scale=2):
+                disease_box = gr.Dropdown(sorted(diseases), label="Diseases 👆")
+            with gr.Column(scale=5):
+                default_symptoms = gr.Textbox(
+                    label="Related Symptoms:", visible=True, interactive=False
                 )
 
-                gen_key_btn = gr.Button("Generate the evaluation key 👆")
-                error_box2 = gr.Textbox(label="Error ❌", visible=False)
-                user_id_box = gr.Textbox(label="User ID:", interactive=False, visible=True)
-                key_len_box = gr.Textbox(
-                    label="Evaluation Key Size:", interactive=False, visible=False
+        disease_box.change(fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms])
+
+        user_vect_box1 = gr.Textbox(visible=False)
+
+        with gr.Row():
+            with gr.Column():
+                # Submit botton
+                submit_button = gr.Button("Submit Symptoms 👆")
+            with gr.Column():
+                # Clear botton
+                clear_button = gr.Button("Reset Space 🔁")      
+
+        # ------------------------- Step 2 -------------------------
+        gr.Markdown("## Step 2: Encrypt data")
+        gr.Markdown("<span style='color:grey'>Client Side</span>")
+        gr.Markdown("### Key Generation")
+        gr.Markdown(
+            "In FHE schemes, a secret (enc/dec)ryption keys are generated for encrypting and decrypting data owned by the client. \n\n"
+            "Additionally, a public evaluation key is generated, enabling external entities to perform homomorphic operations on encrypted data, without the need to decrypt them. \n\n"
+            "The evaluation key will be transmitted to the server for further processing."
+        )
+
+        gen_key_btn = gr.Button("Generate the evaluation key 👆")
+        error_box2 = gr.Textbox(label="Error ❌", visible=False)
+        user_id_box = gr.Textbox(label="User ID:", interactive=False, visible=True)
+        key_len_box = gr.Textbox(
+            label="Evaluation Key Size:", interactive=False, visible=False
+        )
+        key_box = gr.Textbox(
+            label="Evaluation key (truncated):",
+            max_lines=3,
+            interactive=False,
+            visible=False,
+        )
+
+        gr.Markdown("### Encrypt the data")
+
+        encrypt_btn = gr.Button("Encrypt the data using the 🔒 private secret key 👆")
+        error_box3 = gr.Textbox(label="Error ❌", visible=False)
+        quant_vect_box = gr.Textbox(
+            label="Quantized Vector:",
+            interactive=False,
+            visible=False,
+        )
+
+        with gr.Row():
+            with gr.Column():
+                user_vect_box2 = gr.Textbox(
+                    label="User Symptoms Vector:", interactive=False, max_lines=10
                 )
-                key_box = gr.Textbox(
-                    label="Evaluation key (truncated):",
-                    max_lines=3,
+
+            with gr.Column():
+                enc_vect_box = gr.Textbox(
+                    label="Encrypted Vector:",
+                    max_lines=10,
                     interactive=False,
-                    visible=False,
                 )
 
-                gr.Markdown("## Encrypt the data")
+        encrypt_btn.click(
+            encrypt_fn,
+            inputs=[user_vect_box1, user_id_box],
+            outputs=[
+                user_vect_box2,
+                enc_vect_box,
+                error_box3,
+            ],
+        )
 
-                encrypt_btn = gr.Button("Encrypt the data using the 🔒 private secret key 👆")
-                error_box3 = gr.Textbox(label="Error ❌", visible=False)
-                quant_vect_box = gr.Textbox(
-                    label="Quantized Vector:",
-                    interactive=False,
-                    visible=False,
+        gr.Markdown(
+            "### Send the encrypted data to the "
+            "<span style='color:grey'>Server Side</span>"
+        )
+
+        error_box4 = gr.Textbox(label="Error ❌", visible=False)
+
+        with gr.Row().style(equal_height=False):
+            with gr.Column(scale=4):
+                send_input_btn = gr.Button("Send the encrypted data 👆")
+            with gr.Column(scale=1):
+                srv_resp_send_data_box = gr.Checkbox(
+                    label="Data Sent", show_label=False, interactive=False
                 )
 
-                with gr.Row():
-                    with gr.Column():
-                        user_vect_box2 = gr.Textbox(
-                            label="User Symptoms Vector:", interactive=False, max_lines=10
-                        )
+        send_input_btn.click(
+            send_input_fn,
+            inputs=[user_id_box, user_vect_box1],
+            outputs=[error_box4, srv_resp_send_data_box],
+        )
 
-                    with gr.Column():
-                        enc_vect_box = gr.Textbox(
-                            label="Encrypted Vector:",
-                            max_lines=10,
-                            interactive=False,
-                        )
+        # ------------------------- Step 3 -------------------------
 
-                encrypt_btn.click(
-                    encrypt_fn,
-                    inputs=[user_vect_box1, user_id_box],
-                    outputs=[
-                        user_vect_box2,
-                        enc_vect_box,
-                        error_box3,
-                    ],
+        gr.Markdown("## Step 3: Run the FHE evaluation")
+        gr.Markdown("<span style='color:grey'>Server Side</span>")
+        gr.Markdown(
+            "Once the server receives the encrypted data, it can process and compute the output without ever decrypting the data just as it would on clear data.\n\n"
+            "This server employs a [logistic regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
+        )
+
+        run_fhe_btn = gr.Button("Run the FHE evaluation 👆")
+        error_box5 = gr.Textbox(label="Error ❌", visible=False)
+        fhe_execution_time_box = gr.Textbox(
+            label="Total FHE Execution Time:", interactive=False, visible=True
+        )
+
+        run_fhe_btn.click(
+            run_fhe_fn,
+            inputs=[user_id_box],
+            outputs=[fhe_execution_time_box, error_box5],
+        )
+
+        # ------------------------- Step 4 -------------------------
+
+        gr.Markdown("## Step 4: Decrypt the data")
+        gr.Markdown("<span style='color:grey'>Client Side</span>")
+
+        gr.Markdown("### Get the data from the <span style='color:grey'>Server Side</span>")
+
+        error_box6 = gr.Textbox(label="Error ❌", visible=False)
+
+        with gr.Row().style(equal_height=True):
+            with gr.Column(scale=4):
+                get_output_btn = gr.Button("Get data 👆")
+            with gr.Column(scale=1):
+                srv_resp_retrieve_data_box = gr.Checkbox(
+                    label="Data Received", show_label=False, interactive=False
                 )
 
-                gr.Markdown(
-                    "## Send the encrypted data to the "
-                    "<span style='color:grey'>Server Side</span>"
-                )
+        get_output_btn.click(
+            get_output_fn,
+            inputs=[user_id_box, user_vect_box1],
+            outputs=[srv_resp_retrieve_data_box, error_box6],
+        )
 
-                error_box4 = gr.Textbox(label="Error ❌", visible=False)
+        gr.Markdown("### Decrypt the output")
 
-                with gr.Row().style(equal_height=False):
-                    with gr.Column(scale=4):
-                        send_input_btn = gr.Button("Send the encrypted data 👆")
-                    with gr.Column(scale=1):
-                        srv_resp_send_data_box = gr.Checkbox(
-                            label="Data Sent", show_label=False, interactive=False
-                        )
+        decrypt_target_btn = gr.Button(
+            "Decrypt the output with the 🔒 private secret decryption key 👆"
+        )
+        error_box7 = gr.Textbox(label="Error ❌", visible=False)
+        decrypt_target_box = gr.Textbox(label="Decrypted Output:", interactive=False)
 
-                send_input_btn.click(
-                    send_input_fn,
-                    inputs=[user_id_box, user_vect_box1],
-                    outputs=[error_box4, srv_resp_send_data_box],
-                )
-
-            with gr.TabItem("3. FHE execution", id=2):
-                gr.Markdown("## Step 3: Run the FHE evaluation")
-                gr.Markdown("<span style='color:grey'>Server Side</span>")
-                gr.Markdown(
-                    "Once the server receives the encrypted data, it can process and compute the output without ever decrypting the data just as it would on clear data.\n\n"
-                    "This server employs a [logistic regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
-                )
-
-                run_fhe_btn = gr.Button("Run the FHE evaluation 👆")
-                error_box5 = gr.Textbox(label="Error ❌", visible=False)
-                fhe_execution_time_box = gr.Textbox(
-                    label="Total FHE Execution Time:", interactive=False, visible=True
-                )
-
-                run_fhe_btn.click(
-                    run_fhe_fn,
-                    inputs=[user_id_box],
-                    outputs=[fhe_execution_time_box, error_box5],
-                )
-
-            with gr.TabItem("4. Data Decryption", id=3):
-                gr.Markdown("## Step 4: Decrypt the data")
-                gr.Markdown("<span style='color:grey'>Client Side</span>")
-
-                gr.Markdown("### Get the data from the <span style='color:grey'>Server Side</span>")
-
-                error_box6 = gr.Textbox(label="Error ❌", visible=False)
-
-                with gr.Row().style(equal_height=True):
-                    with gr.Column(scale=4):
-                        get_output_btn = gr.Button("Get data 👆")
-                    with gr.Column(scale=1):
-                        srv_resp_retrieve_data_box = gr.Checkbox(
-                            label="Data Received", show_label=False, interactive=False
-                        )
-
-                get_output_btn.click(
-                    get_output_fn,
-                    inputs=[user_id_box, user_vect_box1],
-                    outputs=[srv_resp_retrieve_data_box, error_box6],
-                )
-
-                gr.Markdown("### Decrypt the output")
-
-                decrypt_target_btn = gr.Button(
-                    "Decrypt the output with the 🔒 private secret decryption key 👆"
-                )
-                error_box7 = gr.Textbox(label="Error ❌", visible=False)
-                decrypt_target_box = gr.Textbox(label="Decrypted Output:", interactive=False)
-
-                decrypt_target_btn.click(
-                    decrypt_fn,
-                    inputs=[user_id_box, user_vect_box1, *check_boxes],
-                    outputs=[decrypt_target_box, error_box7],
-                )
+        decrypt_target_btn.click(
+            decrypt_fn,
+            inputs=[user_id_box, user_vect_box1, *check_boxes],
+            outputs=[decrypt_target_box, error_box7],
+        )
         
+        # ------------------------- End -------------------------
+
         gr.Markdown(
             """The app was built with [Concrete ML](https://github.com/zama-ai/concrete-ml), a Privacy-Preserving Machine Learning (PPML) open-source set of tools by Zama. 
             Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
         """)
+
+
+        submit_button.click(
+            fn=get_features_fn,
+            inputs=[*check_boxes],
+            outputs=[user_vect_box1, error_box1, submit_button],
+        )
 
         gen_key_btn.click(
             key_gen_fn,
@@ -749,12 +759,6 @@ if __name__ == "__main__":
                 key_len_box,
                 error_box2,
             ],
-        )
-
-        submit_button.click(
-            fn=get_features_fn,
-            inputs=[*check_boxes],
-            outputs=[user_vect_box1, error_box1, submit_button],
         )
 
         clear_button.click(
