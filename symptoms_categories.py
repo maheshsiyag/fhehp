@@ -84,8 +84,8 @@ THORAX_SYMPTOMS = {
     ]
 }
 
-EYES_SYMPTOMS = {
-    "EYES_CONCERNS": [
+OPHTHALMOLOGICAL_SYMPTOMS = {
+    "OPHTHALMOLOGICAL_CONCERNS": [
         "sunken_eyes",
         "redness_of_eyes",
         "watering_from_eyes",
@@ -96,7 +96,7 @@ EYES_SYMPTOMS = {
 }
 
 VASCULAR_LYMPHATIC_SYMPTOMS = {
-    "VASCULAR_LYMPHATIC_CONCERNS": [
+    "VASCULAR_AND_LYMPHATIC_CONCERNS": [
         "cold_hands_and_feets",
         "swollen_blood_vessels",
         "swollen_legs",
@@ -191,7 +191,7 @@ SYMPTOMS_LIST = [
     DERMATOLOGICAL_SYMPTOMS,
     MUSCULOSKELETAL_SYMPTOMS,
     # Column 3
-    EYES_SYMPTOMS,
+    OPHTHALMOLOGICAL_SYMPTOMS,
     THORAX_SYMPTOMS,
     GENERAL_SYMPTOMS,
 ]

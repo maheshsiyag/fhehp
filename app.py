@@ -437,16 +437,14 @@ def decrypt_fn(
 
     out = ""
 
-    if (
-        (top3_proba[0] < threshold)
-        or (np.sum(top3_proba) < threshold)
-        or (abs(top3_proba[0] - top3_proba[1]) < threshold)
-    ):
-        out = "⚠️ The prediction appears uncertain; including more symptoms may improve the results."
+    if top3_proba[0] < threshold or abs(top3_proba[0] - top3_proba[1]) < 0.1:
+        out = (
+            "⚠️ The prediction appears uncertain; including more symptoms "
+            "may improve the results.\n\n"
+        )
 
     out = (
-        f"{out}\n"
-        "Given the symptoms you provided: "
+        f"{out}Given the symptoms you provided: "
         f"{pretty_print(checked_symptoms, case_conversion=str.capitalize, delimiter=', ')}\n\n"
         "Here are the top3 predictions:\n\n"
         f"1. « {get_disease_name(top3_diseases[0])} » with a probability of {top3_proba[0]:.2%}\n"
@@ -529,9 +527,9 @@ if __name__ == "__main__":
         gr.Markdown("## Notes")
         gr.Markdown(
             """
-        - The private key is used to encrypt and decrypt the data and shall never be shared.
-        - The evaluation key is a public key that the server needs to process encrypted data.
-        """
+            - The private key is used to encrypt and decrypt the data and shall never be shared.
+            - The evaluation key is a public key that the server needs to process encrypted data.
+            """
         )
 
         # ------------------------- Step 1 -------------------------
@@ -666,7 +664,7 @@ if __name__ == "__main__":
         gr.Markdown("<span style='color:grey'>Server Side</span>")
         gr.Markdown(
             "Once the server receives the encrypted data, it can process and compute the output without ever decrypting the data just as it would on clear data.\n\n"
-            "This server employs a [Logistic Regression]() model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
+            "This server employs a [Logistic Regression](https://github.com/zama-ai/concrete-ml/tree/release/1.1.x/use_case_examples/disease_prediction) model that has been trained on this [data-set](https://github.com/anujdutt9/Disease-Prediction-from-Symptoms/tree/master/dataset)."
         )
 
         run_fhe_btn = gr.Button("Run the FHE evaluation")
@@ -719,7 +717,7 @@ if __name__ == "__main__":
         gr.Markdown(
             """The app was built with [Concrete ML](https://github.com/zama-ai/concrete-ml), a Privacy-Preserving Machine Learning (PPML) open-source set of tools by Zama. 
             Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
-        """
+            """
         )
 
         gr.Markdown("\n\n")
@@ -728,7 +726,7 @@ if __name__ == "__main__":
             """**Please Note**: This space is intended solely for educational and demonstration purposes. 
            It should not be considered as a replacement for professional medical counsel, diagnosis, or therapy for any health or related issues. 
            Any questions or concerns about your individual health should be addressed to your doctor or another qualified healthcare provider.
-        """
+            """
         )
 
         clear_button.click(

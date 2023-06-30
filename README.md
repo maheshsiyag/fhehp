@@ -1,5 +1,5 @@
 ---
-title: Health Prediction On Ecrypted data with FHE
+title: Health Prediction On Encrypted Data Using Fully Homomorphic Encryption
 emoji: 🩺😷
 colorFrom: gray
 colorTo: blue
