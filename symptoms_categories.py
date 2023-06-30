@@ -22,19 +22,17 @@ DIGESTIVE_SYSTEM_SYMPTOMS = {
         "stomach_bleeding",
         "pain_during_bowel_movements",
         "passage_of_gases",
-        "brittle_nails",
         "red_spots_over_body",
         "swelling_of_stomach",
         "bloody_stool",
-        "yellowish_skin",
         "irritation_in_anus",
         "pain_in_anal_region",
         "abnormal_menstruation",
     ]
 }
 
-SKIN_SYMPTOMS = {
-    "SKIN_CONCERNS": [
+DERMATOLOGICAL_SYMPTOMS = {
+    "DERMATOLOGICAL_CONCERNS": [
         "itching",
         "skin_rash",
         "pus_filled_pimples",
@@ -51,6 +49,8 @@ SKIN_SYMPTOMS = {
         "dischromic_patches",
         "nodal_skin_eruptions",
         "toxic_look_(typhus)",
+        "brittle_nails",
+        "yellowish_skin",
     ]
 }
 
@@ -188,7 +188,7 @@ SYMPTOMS_LIST = [
     VASCULAR_LYMPHATIC_SYMPTOMS,
     # Column 2
     ORL_SYMPTOMS,
-    SKIN_SYMPTOMS,
+    DERMATOLOGICAL_SYMPTOMS,
     MUSCULOSKELETAL_SYMPTOMS,
     # Column 3
     EYES_SYMPTOMS,
