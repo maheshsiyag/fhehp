@@ -5,7 +5,7 @@ from typing import List
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import JSONResponse, Response
-from utils import DEPLOYMENT_DIR, SERVER_DIR  # pylint: disable=no-name-in-module)
+from utils import DEPLOYMENT_DIR, SERVER_DIR  # pylint: disable=no-name-in-module
 
 from concrete.ml.deployment import FHEModelServer
 

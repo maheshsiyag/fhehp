@@ -31,8 +31,6 @@ TESTING_FILENAME = "./data/Testing_preprocessed.csv"
 
 # pylint: disable=invalid-name
 
-from typing import List, Tuple
-
 
 def pretty_print(
     inputs, case_conversion=str.title, which_replace: str = "_", to_what: str = " ", delimiter=None
@@ -101,8 +99,6 @@ def load_data() -> Union[Tuple[pandas.DataFrame, numpy.ndarray], List]:
 
     Return:
         The train, testing set and valid symptoms.
-
-
     """
     # Load data
     df_train = pandas.read_csv(TRAINING_FILENAME)
