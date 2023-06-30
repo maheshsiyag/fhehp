@@ -202,7 +202,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
     client.load()
 
     user_symptoms = np.fromstring(user_symptoms[2:-2], dtype=int, sep=".").reshape(1, -1)
-    #quant_user_symptoms = client.model.quantize_input(user_symptoms)
+    # quant_user_symptoms = client.model.quantize_input(user_symptoms)
 
     encrypted_quantized_user_symptoms = client.quantize_encrypt_serialize(user_symptoms)
     assert isinstance(encrypted_quantized_user_symptoms, bytes)
@@ -457,7 +457,7 @@ def decrypt_fn(
     return {
         error_box7: gr.update(visible=False),
         decrypt_box: out,
-        submit_btn: gr.update(value="Submit")
+        submit_btn: gr.update(value="Submit"),
     }
 
 
@@ -522,13 +522,13 @@ if __name__ == "__main__":
             </p>
 
             <p align="center">
-            <img width="65%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/hf_space_3_health_prediction_cover_image.png">
+            <img width="65%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/healthcare_prediction.jpg">
             </p>
             """
         )
         gr.Markdown("## Notes")
         gr.Markdown(
-        """
+            """
         - The private key is used to encrypt and decrypt the data and shall never be shared.
         - The evaluation key is a public key that the server needs to process encrypted data.
         """
@@ -563,7 +563,10 @@ if __name__ == "__main__":
         error_box1 = gr.Textbox(label="Error ❌", visible=False)
 
         # Default disease, picked from the dataframe
-        gr.Markdown("You can choose an **existing disease** and explore its associated symptoms.", visible=False)
+        gr.Markdown(
+            "You can choose an **existing disease** and explore its associated symptoms.",
+            visible=False,
+        )
 
         with gr.Row():
             with gr.Column(scale=2):
@@ -575,10 +578,11 @@ if __name__ == "__main__":
         # Submit botton
         submit_btn = gr.Button("Submit")
         # Clear botton
-        clear_button = gr.Button("Reset Space 🔁", visible=False)    
-    
-        disease_box.change(fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms])
+        clear_button = gr.Button("Reset Space 🔁", visible=False)
 
+        disease_box.change(
+            fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms]
+        )
 
         submit_btn.click(
             fn=get_features_fn,
@@ -602,9 +606,9 @@ if __name__ == "__main__":
         gen_key_btn = gr.Button("Generate the evaluation key")
         error_box2 = gr.Textbox(label="Error ❌", visible=False)
         user_id_box = gr.Textbox(label="User ID:", visible=True)
-        key_len_box = gr.Textbox(label="Evaluation Key Size:",  visible=False)
+        key_len_box = gr.Textbox(label="Evaluation Key Size:", visible=False)
         key_box = gr.Textbox(label="Evaluation key (truncated):", max_lines=3, visible=False)
-        
+
         gen_key_btn.click(
             key_gen_fn,
             inputs=one_hot_vector,
@@ -679,7 +683,9 @@ if __name__ == "__main__":
         gr.Markdown("## Step 4: Decrypt the data")
         gr.Markdown("<hr />")
         gr.Markdown("<span style='color:grey'>Client Side</span>")
-        gr.Markdown("### Get the encrypted data from the <span style='color:grey'>Server Side</span>")
+        gr.Markdown(
+            "### Get the encrypted data from the <span style='color:grey'>Server Side</span>"
+        )
 
         error_box6 = gr.Textbox(label="Error ❌", visible=False)
 
@@ -707,21 +713,23 @@ if __name__ == "__main__":
             inputs=[user_id_box, one_hot_vector, *check_boxes],
             outputs=[decrypt_box, error_box7, submit_btn],
         )
-        
+
         # ------------------------- End -------------------------
-        
+
         gr.Markdown(
             """The app was built with [Concrete ML](https://github.com/zama-ai/concrete-ml), a Privacy-Preserving Machine Learning (PPML) open-source set of tools by Zama. 
             Try it yourself and don't forget to star on [Github](https://github.com/zama-ai/concrete-ml) ⭐.
-        """)
+        """
+        )
 
         gr.Markdown("\n\n")
 
         gr.Markdown(
-           """**Please Note**: This space is intended solely for educational and demonstration purposes. 
+            """**Please Note**: This space is intended solely for educational and demonstration purposes. 
            It should not be considered as a replacement for professional medical counsel, diagnosis, or therapy for any health or related issues. 
            Any questions or concerns about your individual health should be addressed to your doctor or another qualified healthcare provider.
-        """)
+        """
+        )
 
         clear_button.click(
             reset_fn,
