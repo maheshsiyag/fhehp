@@ -31,7 +31,7 @@ First, create a virtual env and activate it:
 <!--pytest-codeblocks:skip-->
 
 ```bash
-python3 -m venv .venv2
+python3 -m venv .venv
 source .venv/bin/activate
 ```
 
