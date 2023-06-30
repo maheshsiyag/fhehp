@@ -115,12 +115,12 @@ def get_features_fn(*checked_symptoms: Tuple[str]) -> Dict:
         print("Provide at least 5 symptoms.")
         return {
             error_box1: gr.update(visible=True, value="⚠️ Provide at least 5 symptoms"),
-            one_hot_vector: None,
+            one_hot_vect: None,
         }
 
     return {
         error_box1: gr.update(visible=False),
-        one_hot_vector: gr.update(
+        one_hot_vect: gr.update(
             visible=False,
             value=get_user_symptoms_from_checkboxgroup(pretty_print(checked_symptoms)),
         ),
@@ -217,7 +217,7 @@ def encrypt_fn(user_symptoms: np.ndarray, user_id: str) -> None:
 
     return {
         error_box3: gr.update(visible=False),
-        one_hot_vector_box: gr.update(visible=True, value=user_symptoms),
+        one_hot_vect_box: gr.update(visible=True, value=user_symptoms),
         enc_vect_box: gr.update(visible=True, value=encrypted_quantized_user_symptoms_shorten_hex),
     }
 
@@ -435,19 +435,19 @@ def decrypt_fn(
     top3_diseases = np.argsort(output.flatten())[-3:][::-1]
     top3_proba = output[0][top3_diseases]
 
+    out = ""
+
     if (
         (top3_proba[0] < threshold)
         or (np.sum(top3_proba) < threshold)
         or (abs(top3_proba[0] - top3_proba[1]) < threshold)
     ):
-        out = "⚠️ The prediction appears uncertain; including more symptoms may improve the results.\n\n"
-
-    else:
-        out = ""
+        out = "⚠️ The prediction appears uncertain; including more symptoms may improve the results."
 
     out = (
-        f"{out}"
-        f"Given the symptoms you provided: {pretty_print(checked_symptoms, case_conversion=str.capitalize, delimiter=', ')}\n\n"
+        f"{out}\n"
+        "Given the symptoms you provided: "
+        f"{pretty_print(checked_symptoms, case_conversion=str.capitalize, delimiter=', ')}\n\n"
         "Here are the top3 predictions:\n\n"
         f"1. « {get_disease_name(top3_diseases[0])} » with a probability of {top3_proba[0]:.2%}\n"
         f"2. « {get_disease_name(top3_diseases[1])} » with a probability of {top3_proba[1]:.2%}\n"
@@ -467,18 +467,18 @@ def reset_fn():
     clean_directory()
 
     return {
-        one_hot_vector_box: None,
-        submit_btn: gr.update(value="Submit"),
-        user_id_box: gr.update(visible=False, value=None),
-        one_hot_vector: None,
-        default_symptoms: gr.update(visible=True, value=None),
-        disease_box: gr.update(visible=True, value=None),
-        quant_vect_box: gr.update(visible=False, value=None),
+        one_hot_vect: None,
+        one_hot_vect_box: None,
         enc_vect_box: gr.update(visible=True, value=None),
+        quant_vect_box: gr.update(visible=False, value=None),
+        user_id_box: gr.update(visible=False, value=None),
+        default_symptoms: gr.update(visible=True, value=None),
+        default_disease_box: gr.update(visible=True, value=None),
         key_box: gr.update(visible=True, value=None),
         key_len_box: gr.update(visible=False, value=None),
         fhe_execution_time_box: gr.update(visible=True, value=None),
         decrypt_box: None,
+        submit_btn: gr.update(value="Submit"),
         error_box7: gr.update(visible=False),
         error_box1: gr.update(visible=False),
         error_box2: gr.update(visible=False),
@@ -570,24 +570,24 @@ if __name__ == "__main__":
 
         with gr.Row():
             with gr.Column(scale=2):
-                disease_box = gr.Dropdown(sorted(diseases), label="Diseases", visible=False)
+                default_disease_box = gr.Dropdown(sorted(diseases), label="Diseases", visible=False)
             with gr.Column(scale=5):
                 default_symptoms = gr.Textbox(label="Related Symptoms:", visible=False)
         # User vector symptoms encoded in oneHot representation
-        one_hot_vector = gr.Textbox(visible=False)
+        one_hot_vect = gr.Textbox(visible=False)
         # Submit botton
         submit_btn = gr.Button("Submit")
         # Clear botton
         clear_button = gr.Button("Reset Space 🔁", visible=False)
 
-        disease_box.change(
-            fn=display_default_symptoms_fn, inputs=[disease_box], outputs=[default_symptoms]
+        default_disease_box.change(
+            fn=display_default_symptoms_fn, inputs=[default_disease_box], outputs=[default_symptoms]
         )
 
         submit_btn.click(
             fn=get_features_fn,
             inputs=[*check_boxes],
-            outputs=[one_hot_vector, error_box1, submit_btn],
+            outputs=[one_hot_vect, error_box1, submit_btn],
         )
 
         # ------------------------- Step 2 -------------------------
@@ -611,7 +611,7 @@ if __name__ == "__main__":
 
         gen_key_btn.click(
             key_gen_fn,
-            inputs=one_hot_vector,
+            inputs=one_hot_vect,
             outputs=[
                 key_box,
                 user_id_box,
@@ -628,15 +628,15 @@ if __name__ == "__main__":
 
         with gr.Row():
             with gr.Column():
-                one_hot_vector_box = gr.Textbox(label="User Symptoms Vector:", max_lines=10)
+                one_hot_vect_box = gr.Textbox(label="User Symptoms Vector:", max_lines=10)
             with gr.Column():
                 enc_vect_box = gr.Textbox(label="Encrypted Vector:", max_lines=10)
 
         encrypt_btn.click(
             encrypt_fn,
-            inputs=[one_hot_vector, user_id_box],
+            inputs=[one_hot_vect, user_id_box],
             outputs=[
-                one_hot_vector_box,
+                one_hot_vect_box,
                 enc_vect_box,
                 error_box3,
             ],
@@ -655,7 +655,7 @@ if __name__ == "__main__":
 
         send_input_btn.click(
             send_input_fn,
-            inputs=[user_id_box, one_hot_vector],
+            inputs=[user_id_box, one_hot_vect],
             outputs=[error_box4, srv_resp_send_data_box],
         )
 
@@ -698,7 +698,7 @@ if __name__ == "__main__":
 
         get_output_btn.click(
             get_output_fn,
-            inputs=[user_id_box, one_hot_vector],
+            inputs=[user_id_box, one_hot_vect],
             outputs=[srv_resp_retrieve_data_box, error_box6],
         )
 
@@ -710,7 +710,7 @@ if __name__ == "__main__":
 
         decrypt_btn.click(
             decrypt_fn,
-            inputs=[user_id_box, one_hot_vector, *check_boxes],
+            inputs=[user_id_box, one_hot_vect, *check_boxes],
             outputs=[decrypt_box, error_box7, submit_btn],
         )
 
@@ -734,10 +734,9 @@ if __name__ == "__main__":
         clear_button.click(
             reset_fn,
             outputs=[
-                one_hot_vector_box,
-                one_hot_vector,
+                one_hot_vect_box,
+                one_hot_vect,
                 submit_btn,
-                # disease_box,
                 error_box1,
                 error_box2,
                 error_box3,
@@ -745,7 +744,7 @@ if __name__ == "__main__":
                 error_box5,
                 error_box6,
                 error_box7,
-                disease_box,
+                default_disease_box,
                 default_symptoms,
                 user_id_box,
                 key_len_box,
