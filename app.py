@@ -501,14 +501,18 @@ if __name__ == "__main__":
     with gr.Blocks() as demo:
 
         # Link + images
+        gr.Markdown()
         gr.Markdown(
             """
             <p align="center">
                 <img width=200 src="https://user-images.githubusercontent.com/5758427/197816413-d9cddad3-ba38-4793-847d-120975e1da11.png">
             </p>
-
-            <h2 align="center">Health Prediction On Encrypted Data Using Fully Homomorphic Encryption.</h2>
-
+            """)
+        gr.Markdown()
+        gr.Markdown("""<h2 align="center">Health Prediction On Encrypted Data Using Fully Homomorphic Encryption</h2>""")
+        gr.Markdown()
+        gr.Markdown(
+            """
             <p align="center">
                 <a href="https://github.com/zama-ai/concrete-ml"> <img style="vertical-align: middle; display:inline-block; margin-right: 3px;" width=15 src="https://user-images.githubusercontent.com/5758427/197972109-faaaff3e-10e2-4ab6-80f5-7531f7cfb08f.png">Concrete-ML</a>
                 —
@@ -518,9 +522,12 @@ if __name__ == "__main__":
                 —
                 <a href="https://twitter.com/zama_fhe"> <img style="vertical-align: middle; display:inline-block; margin-right: 3px;" width=15 src="https://user-images.githubusercontent.com/5758427/197975044-bab9d199-e120-433b-b3be-abd73b211a54.png">@zama_fhe</a>
             </p>
-
+            """)
+        gr.Markdown()
+        gr.Markdown(
+            """"
             <p align="center">
-            <img width="65%" height="20%" src="https://raw.githubusercontent.com/kcelia/Img/main/healthcare_prediction.jpg">
+            <img width="65%" height="25%" src="https://raw.githubusercontent.com/kcelia/Img/main/healthcare_prediction.jpg">
             </p>
             """
         )

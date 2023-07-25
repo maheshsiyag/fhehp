@@ -145,6 +145,7 @@ MUSCULOSKELETAL_SYMPTOMS = {
 
 GENERAL_SYMPTOMS = {
     "GENERAL_CONCERNS": [
+        "acute_liver_failure",
         "anxiety",
         "restlessness",
         "lethargy",
@@ -168,7 +169,6 @@ GENERAL_SYMPTOMS = {
         "sweating",
         "internal_itching",
         "mild_fever",
-        "acute_liver_failure",
         "dehydration",
         "headache",
         "frequent_unprotected_sexual_intercourse_with_multiple_partners",
