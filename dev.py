@@ -42,7 +42,7 @@ fhe_circuit = clf.compile(X_train)
 
 fhe_circuit.client.keygen(force=False)
 
-path_to_model = Path("./deployment_logit/").resolve()
+path_to_model = Path("./deployment_files/").resolve()
 
 if path_to_model.exists():
     shutil.rmtree(path_to_model)

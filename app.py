@@ -171,10 +171,11 @@ def key_gen_fn(user_symptoms: List[str]) -> Dict:
     return {
         error_box2: gr.update(visible=False),
         key_box: gr.update(visible=False, value=serialized_evaluation_keys_shorten_hex),
-        user_id_box: gr.update(visible=True, value=user_id),
+        user_id_box: gr.update(visible=False, value=user_id),
         key_len_box: gr.update(
             visible=False, value=f"{len(serialized_evaluation_keys) / (10**6):.2f} MB"
         ),
+        gen_key_btn: gr.update(value="Keys have been generated ✅")
     }
 
 
@@ -608,9 +609,9 @@ if __name__ == "__main__":
             "The evaluation key will be transmitted to the server for further processing."
         )
 
-        gen_key_btn = gr.Button("Generate the evaluation key")
+        gen_key_btn = gr.Button("Generate the private and evaluation keys.")
         error_box2 = gr.Textbox(label="Error ❌", visible=False)
-        user_id_box = gr.Textbox(label="User ID:", visible=True)
+        user_id_box = gr.Textbox(label="User ID:", visible=False)
         key_len_box = gr.Textbox(label="Evaluation Key Size:", visible=False)
         key_box = gr.Textbox(label="Evaluation key (truncated):", max_lines=3, visible=False)
 
@@ -622,6 +623,7 @@ if __name__ == "__main__":
                 user_id_box,
                 key_len_box,
                 error_box2,
+                gen_key_btn,
             ],
         )
 

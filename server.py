@@ -9,6 +9,9 @@ from utils import DEPLOYMENT_DIR, SERVER_DIR  # pylint: disable=no-name-in-modul
 
 from concrete.ml.deployment import FHEModelServer
 
+# Load the FHE server
+FHE_SERVER = FHEModelServer(DEPLOYMENT_DIR)
+
 # Initialize an instance of FastAPI
 app = FastAPI()
 
@@ -62,12 +65,9 @@ def run_fhe(
         encrypted_output = encrypted_output_file.read()
         evaluation_key = evaluation_key_file.read()
 
-    # Load the FHE server and the model
-    fhe_server = FHEModelServer(DEPLOYMENT_DIR)
-
     # Run the FHE execution
     start = time.time()
-    encrypted_output = fhe_server.run(encrypted_output, evaluation_key)
+    encrypted_output = FHE_SERVER.run(encrypted_output, evaluation_key)
     assert isinstance(encrypted_output, bytes)
     fhe_execution_time = round(time.time() - start, 2)
 

@@ -1,2 +1,7 @@
 __pycache__/
 .ipynb_checkpoints
+
+.venv
+deployment_files/.*
+deployment_files/client_dir/
+deployment_files/server_dir/
